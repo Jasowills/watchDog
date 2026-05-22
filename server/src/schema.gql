@@ -1,0 +1,203 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateEnvironmentInput {
+  color: String
+  key: String
+  name: String!
+  projectId: String!
+}
+
+input CreateMonitorInput {
+  environmentId: String!
+  expectedKeyword: String
+  expectedStatus: Int
+  intervalSeconds: Int
+  method: String
+  name: String!
+  serviceId: String!
+  targetUrl: String!
+  timeoutSeconds: Int
+}
+
+input CreateProjectInput {
+  name: String!
+  slug: String
+  workspaceId: String!
+}
+
+input CreateServiceInput {
+  description: String
+  name: String!
+  projectId: String!
+  slug: String
+}
+
+input CreateWorkspaceInput {
+  name: String!
+  slug: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DeploymentModel {
+  deployedAt: DateTime!
+  deployedBy: String
+  description: String
+  environmentName: String!
+  id: String!
+  serviceName: String
+  status: DeploymentStatus!
+  version: String!
+}
+
+"""Lifecycle state of a recorded deployment."""
+enum DeploymentStatus {
+  FAILED
+  IN_PROGRESS
+  ROLLED_BACK
+  SUCCEEDED
+}
+
+type EnvironmentModel {
+  color: String
+  id: String!
+  key: String!
+  name: String!
+  projectId: String!
+}
+
+type MonitorModel {
+  environmentName: String!
+  expectedStatus: Int!
+  id: String!
+  intervalSeconds: Int!
+  isActive: Boolean!
+  latestLatencyMs: Int
+  latestState: String!
+  method: String!
+  name: String!
+  serviceName: String!
+  targetUrl: String!
+  timeoutSeconds: Int!
+  updatedAt: DateTime!
+}
+
+type Mutation {
+  createEnvironment(input: CreateEnvironmentInput!): EnvironmentModel!
+  createMonitor(input: CreateMonitorInput!): MonitorModel!
+  createProject(input: CreateProjectInput!): ProjectModel!
+  createService(input: CreateServiceInput!): ServiceModel!
+  createWorkspace(input: CreateWorkspaceInput!): WorkspaceModel!
+  deleteEnvironment(id: String!): Boolean!
+  deleteMonitor(id: String!): Boolean!
+  deleteProject(id: String!): Boolean!
+  deleteService(id: String!): Boolean!
+  recordDeployment(input: RecordDeploymentInput!): DeploymentModel!
+  updateEnvironment(input: UpdateEnvironmentInput!): EnvironmentModel!
+  updateMonitor(input: UpdateMonitorInput!): MonitorModel!
+  updateProject(input: UpdateProjectInput!): ProjectModel!
+  updateService(input: UpdateServiceInput!): ServiceModel!
+}
+
+type OverviewMetricModel {
+  detail: String!
+  label: String!
+  value: String!
+}
+
+type OverviewSnapshotModel {
+  metrics: [OverviewMetricModel!]!
+  monitors: [MonitorModel!]!
+  productionMonitorCount: Int!
+  projectName: String!
+  workspaceName: String!
+}
+
+type PlatformOverview {
+  checkedAt: String!
+  graphPath: String!
+  name: String!
+  stage: String!
+  uptimeSeconds: Float!
+}
+
+type ProjectModel {
+  createdAt: DateTime!
+  id: String!
+  name: String!
+  slug: String!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
+type Query {
+  deployments(environmentKey: String, limit: Int, projectSlug: String): [DeploymentModel!]!
+  environments(projectSlug: String): [EnvironmentModel!]!
+  monitors(environmentKey: String, projectSlug: String): [MonitorModel!]!
+  overviewSnapshot(workspaceSlug: String): OverviewSnapshotModel!
+  platformOverview: PlatformOverview!
+  projects(workspaceSlug: String): [ProjectModel!]!
+  services(projectSlug: String): [ServiceModel!]!
+  workspaces: [WorkspaceModel!]!
+}
+
+input RecordDeploymentInput {
+  deployedBy: String
+  description: String
+  environmentId: String!
+  serviceId: String
+  status: DeploymentStatus
+  version: String!
+}
+
+type ServiceModel {
+  createdAt: DateTime!
+  description: String
+  id: String!
+  name: String!
+  projectId: String!
+  slug: String!
+  updatedAt: DateTime!
+}
+
+input UpdateEnvironmentInput {
+  color: String
+  id: String!
+  name: String
+}
+
+input UpdateMonitorInput {
+  expectedKeyword: String
+  expectedStatus: Int
+  id: String!
+  intervalSeconds: Int
+  isActive: Boolean
+  method: String
+  name: String
+  targetUrl: String
+  timeoutSeconds: Int
+}
+
+input UpdateProjectInput {
+  id: String!
+  name: String
+}
+
+input UpdateServiceInput {
+  description: String
+  id: String!
+  name: String
+}
+
+type WorkspaceModel {
+  createdAt: DateTime!
+  id: String!
+  name: String!
+  slug: String!
+  updatedAt: DateTime!
+}

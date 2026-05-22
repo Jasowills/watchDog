@@ -1,0 +1,148 @@
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+
+import { PrismaService } from '../prisma/prisma.service';
+import { mapPrismaError } from '../shared/prisma-errors';
+import { fallbackMonitors, fallbackProjects } from '../shared/fallback-data';
+import { MonitorModel } from './models/monitor.model';
+import { CreateMonitorInput, UpdateMonitorInput } from './monitors.inputs';
+
+/** The minimum shape needed to render a monitor as a flat view model. */
+type MonitorViewSource = {
+  id: string;
+  name: string;
+  targetUrl: string;
+  method: string;
+  expectedStatus: number;
+  intervalSeconds: number;
+  timeoutSeconds: number;
+  isActive: boolean;
+  updatedAt: Date;
+  service: { name: string };
+  environment: { name: string };
+  checkResults: Array<{ state: string; latencyMs: number | null }>;
+};
+
+const monitorInclude = {
+  service: true,
+  environment: true,
+  checkResults: {
+    orderBy: { checkedAt: 'desc' },
+    take: 1,
+  },
+} satisfies Prisma.MonitorInclude;
+
+@Injectable()
+export class MonitorsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(
+    projectSlug?: string,
+    environmentKey?: string,
+  ): Promise<MonitorModel[]> {
+    try {
+      const monitors = await this.prisma.monitor.findMany({
+        where: {
+          ...(projectSlug
+            ? { service: { project: { slug: projectSlug } } }
+            : {}),
+          ...(environmentKey ? { environment: { key: environmentKey } } : {}),
+        },
+        include: monitorInclude,
+        orderBy: { updatedAt: 'desc' },
+      });
+
+      if (monitors.length > 0) {
+        return monitors.map((monitor) => this.toView(monitor));
+      }
+    } catch {
+      // fall back below
+    }
+
+    if (projectSlug && projectSlug !== fallbackProjects[0].slug) {
+      return [];
+    }
+
+    return fallbackMonitors
+      .filter(
+        (monitor) =>
+          !environmentKey || monitor.environment.key === environmentKey,
+      )
+      .map((monitor) => this.toView(monitor));
+  }
+
+  async create(input: CreateMonitorInput): Promise<MonitorModel> {
+    try {
+      const monitor = await this.prisma.monitor.create({
+        data: {
+          serviceId: input.serviceId,
+          environmentId: input.environmentId,
+          name: input.name,
+          targetUrl: input.targetUrl,
+          method: input.method,
+          expectedStatus: input.expectedStatus,
+          expectedKeyword: input.expectedKeyword,
+          intervalSeconds: input.intervalSeconds,
+          timeoutSeconds: input.timeoutSeconds,
+        },
+        include: monitorInclude,
+      });
+
+      return this.toView(monitor);
+    } catch (error) {
+      mapPrismaError(error);
+    }
+  }
+
+  async update(input: UpdateMonitorInput): Promise<MonitorModel> {
+    try {
+      const monitor = await this.prisma.monitor.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          targetUrl: input.targetUrl,
+          method: input.method,
+          expectedStatus: input.expectedStatus,
+          expectedKeyword: input.expectedKeyword,
+          intervalSeconds: input.intervalSeconds,
+          timeoutSeconds: input.timeoutSeconds,
+          isActive: input.isActive,
+        },
+        include: monitorInclude,
+      });
+
+      return this.toView(monitor);
+    } catch (error) {
+      mapPrismaError(error);
+    }
+  }
+
+  async remove(id: string): Promise<boolean> {
+    try {
+      await this.prisma.monitor.delete({ where: { id } });
+      return true;
+    } catch (error) {
+      mapPrismaError(error);
+    }
+  }
+
+  private toView(monitor: MonitorViewSource): MonitorModel {
+    const latestCheck = monitor.checkResults[0];
+
+    return {
+      id: monitor.id,
+      name: monitor.name,
+      targetUrl: monitor.targetUrl,
+      method: monitor.method,
+      expectedStatus: monitor.expectedStatus,
+      intervalSeconds: monitor.intervalSeconds,
+      timeoutSeconds: monitor.timeoutSeconds,
+      isActive: monitor.isActive,
+      serviceName: monitor.service.name,
+      environmentName: monitor.environment.name,
+      latestState: latestCheck?.state ?? 'HEALTHY',
+      latestLatencyMs: latestCheck?.latencyMs ?? null,
+      updatedAt: monitor.updatedAt,
+    };
+  }
+}
