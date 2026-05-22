@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { AppShell } from '@/components/app-shell'
@@ -11,6 +12,13 @@ import { SettingsPage } from '@/pages/settings-page'
 import { StatusPagesPage } from '@/pages/status-pages-page'
 import { TracesPage } from '@/pages/traces-page'
 import { useTheme } from '@/hooks/use-theme'
+
+// Lazy-loaded so GSAP/Lenis ship in a separate chunk, off the product app's path.
+const LandingPage = lazy(() =>
+  import('@/pages/landing/landing-page').then((module) => ({
+    default: module.LandingPage,
+  })),
+)
 
 const pageMeta = {
   '/': {
@@ -60,6 +68,18 @@ const pageMeta = {
 function App() {
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
+
+  // The marketing landing page renders standalone — no product app shell.
+  if (location.pathname === '/landing') {
+    return (
+      <Suspense
+        fallback={<div className="min-h-dvh bg-[var(--surface-page)]" />}
+      >
+        <LandingPage />
+      </Suspense>
+    )
+  }
+
   const currentMeta = pageMeta[location.pathname as keyof typeof pageMeta] ?? {
     title: 'Watchdog',
     eyebrow: 'Workspace',
