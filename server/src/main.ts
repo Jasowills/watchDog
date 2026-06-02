@@ -8,6 +8,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 8080);
 }
 void bootstrap();

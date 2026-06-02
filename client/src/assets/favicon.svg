@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#0a0a0a" rx="4"/>
+  <!-- hexagon -->
+  <polygon points="16,3 26,9 26,21 16,27 6,21 6,9" fill="#181818" stroke="#d0d0d0" stroke-width="0.8"/>
+  <!-- outer eye ring -->
+  <circle cx="16" cy="15" r="6" fill="none" stroke="#d0d0d0" stroke-width="0.8"/>
+  <!-- inner eye ring -->
+  <circle cx="16" cy="15" r="2.5" fill="none" stroke="#d0d0d0" stroke-width="0.8"/>
+  <!-- pupil -->
+  <circle cx="16" cy="15" r="1" fill="#d0d0d0"/>
+  <!-- scan line -->
+  <line x1="16" y1="3" x2="16" y2="27" stroke="#d0d0d0" stroke-width="0.4" opacity="0.2"/>
+</svg>

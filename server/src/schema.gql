@@ -2,9 +2,66 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AlertChannelModel {
+  createdAt: DateTime!
+  creatorUserId: String
+  destination: String!
+  id: ID!
+  isEnabled: Boolean!
+  name: String!
+  secretRef: String
+  type: String!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
+type AlertRuleModel {
+  alertChannelId: String!
+  createdAt: DateTime!
+  environmentId: String
+  id: ID!
+  isEnabled: Boolean!
+  minimumSeverity: String
+  name: String!
+  projectId: String
+  serviceId: String
+  triggerType: String!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
+type ApiKeyModel {
+  createdAt: DateTime!
+  expiresAt: String
+  id: String!
+  isRevoked: Boolean!
+  lastUsedAt: String
+  name: String!
+  prefix: String!
+  projectId: String!
+}
+
+type ApiKeyWithSecret {
+  createdAt: DateTime!
+  expiresAt: String
+  id: String!
+  isRevoked: Boolean!
+  key: String!
+  lastUsedAt: String
+  name: String!
+  prefix: String!
+  projectId: String!
+}
+
+input CreateApiKeyInput {
+  expiresAt: String
+  name: String!
+  projectId: String!
+}
+
 input CreateEnvironmentInput {
   color: String
-  key: String
+  key: String!
   name: String!
   projectId: String!
 }
@@ -71,6 +128,45 @@ type EnvironmentModel {
   projectId: String!
 }
 
+type ErrorGroupModel {
+  environmentId: String!
+  environmentName: String!
+  fingerprint: String!
+  firstSeenAt: DateTime!
+  id: String!
+  lastSeenAt: DateTime!
+  occurrenceCount: Float!
+  projectId: String!
+  serviceId: String
+  serviceName: String
+  status: ErrorGroupStatus!
+  title: String!
+}
+
+"""Lifecycle state of a grouped error fingerprint."""
+enum ErrorGroupStatus {
+  IGNORED
+  OPEN
+  RESOLVED
+}
+
+type IncidentModel {
+  createdAt: DateTime!
+  environmentId: String
+  id: ID!
+  ownerUserId: String
+  projectId: String!
+  resolvedAt: DateTime
+  serviceId: String
+  severity: String!
+  startedAt: DateTime!
+  status: String!
+  summary: String
+  title: String!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
 type MonitorModel {
   environmentName: String!
   expectedStatus: Int!
@@ -88,6 +184,7 @@ type MonitorModel {
 }
 
 type Mutation {
+  createApiKey(input: CreateApiKeyInput!): ApiKeyWithSecret!
   createEnvironment(input: CreateEnvironmentInput!): EnvironmentModel!
   createMonitor(input: CreateMonitorInput!): MonitorModel!
   createProject(input: CreateProjectInput!): ProjectModel!
@@ -97,11 +194,29 @@ type Mutation {
   deleteMonitor(id: String!): Boolean!
   deleteProject(id: String!): Boolean!
   deleteService(id: String!): Boolean!
+  markAllNotificationsRead: Boolean!
+  markNotificationRead(id: String!): Boolean!
   recordDeployment(input: RecordDeploymentInput!): DeploymentModel!
+  recordError(input: RecordErrorInput!): ErrorGroupModel!
+  revokeApiKey(input: RevokeApiKeyInput!): ApiKeyModel!
   updateEnvironment(input: UpdateEnvironmentInput!): EnvironmentModel!
   updateMonitor(input: UpdateMonitorInput!): MonitorModel!
   updateProject(input: UpdateProjectInput!): ProjectModel!
   updateService(input: UpdateServiceInput!): ServiceModel!
+  updateWorkspace(input: UpdateWorkspaceInput!): WorkspaceModel!
+}
+
+type NotificationModel {
+  body: String
+  createdAt: DateTime!
+  id: ID!
+  link: String
+  read: Boolean!
+  title: String!
+  type: String!
+  updatedAt: DateTime!
+  userId: String!
+  workspaceId: String!
 }
 
 type OverviewMetricModel {
@@ -136,23 +251,50 @@ type ProjectModel {
 }
 
 type Query {
+  alertChannels: [AlertChannelModel!]!
+  alertRules: [AlertRuleModel!]!
+  apiKeys(projectId: String!): [ApiKeyModel!]!
   deployments(environmentKey: String, limit: Int, projectSlug: String): [DeploymentModel!]!
   environments(projectSlug: String): [EnvironmentModel!]!
+  errorGroups(environmentKey: String, limit: Int, projectSlug: String, serviceId: String): [ErrorGroupModel!]!
+  incidents: [IncidentModel!]!
   monitors(environmentKey: String, projectSlug: String): [MonitorModel!]!
+  notifications(limit: Int, workspaceId: String): [NotificationModel!]!
   overviewSnapshot(workspaceSlug: String): OverviewSnapshotModel!
   platformOverview: PlatformOverview!
   projects(workspaceSlug: String): [ProjectModel!]!
   services(projectSlug: String): [ServiceModel!]!
+  statusPages: [StatusPageModel!]!
+  unreadNotificationCount: Int!
   workspaces: [WorkspaceModel!]!
 }
 
 input RecordDeploymentInput {
   deployedBy: String
   description: String
-  environmentId: String!
+  environmentId: String
+  environmentKey: String
+  projectKey: String
   serviceId: String
   status: DeploymentStatus
   version: String!
+}
+
+input RecordErrorInput {
+  environmentId: String
+  environmentKey: String
+  fingerprint: String!
+  message: String!
+  metadata: String
+  projectId: String
+  projectKey: String
+  release: String
+  serviceId: String
+  stack: String
+}
+
+input RevokeApiKeyInput {
+  id: String!
 }
 
 type ServiceModel {
@@ -163,6 +305,18 @@ type ServiceModel {
   projectId: String!
   slug: String!
   updatedAt: DateTime!
+}
+
+type StatusPageModel {
+  createdAt: DateTime!
+  headline: String
+  id: ID!
+  name: String!
+  projectId: String
+  slug: String!
+  updatedAt: DateTime!
+  visibility: String!
+  workspaceId: String!
 }
 
 input UpdateEnvironmentInput {
@@ -192,6 +346,11 @@ input UpdateServiceInput {
   description: String
   id: String!
   name: String
+}
+
+input UpdateWorkspaceInput {
+  id: String!
+  name: String!
 }
 
 type WorkspaceModel {

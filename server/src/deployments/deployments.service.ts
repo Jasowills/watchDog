@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { DeploymentStatus, Prisma } from '@prisma/client';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { mapPrismaError } from '../shared/prisma-errors';
-import {
-  fallbackDeployments,
-  fallbackProjects,
-} from '../shared/fallback-data';
-import { DeploymentModel } from './models/deployment.model';
+import { DeploymentModel, DeploymentStatus } from './models/deployment.model';
 import { RecordDeploymentInput } from './deployments.inputs';
+
+const DEPLOYMENT_STATUSES = [
+  'IN_PROGRESS',
+  'SUCCEEDED',
+  'FAILED',
+  'ROLLED_BACK',
+] as const;
 
 /** Minimum shape needed to render a deployment as a flat view model. */
 type DeploymentViewSource = {
@@ -58,33 +61,56 @@ export class DeploymentsService {
         return deployments.map((deployment) => this.toView(deployment));
       }
     } catch {
-      // fall back below
+      // noop
     }
 
-    if (params.projectSlug && params.projectSlug !== fallbackProjects[0].slug) {
-      return [];
-    }
-
-    return fallbackDeployments
-      .filter(
-        (deployment) =>
-          !params.environmentKey ||
-          deployment.environment.key === params.environmentKey,
-      )
-      .slice(0, limit)
-      .map((deployment) => this.toView(deployment));
+    return [];
   }
 
   async record(input: RecordDeploymentInput): Promise<DeploymentModel> {
+    // Resolve projectKey → projectId → environmentId if needed
+    let environmentId = input.environmentId;
+    if (!environmentId && input.environmentKey && input.projectKey) {
+      const project = await this.prisma.project
+        .findFirst({
+          where: { slug: input.projectKey },
+          select: { id: true },
+        })
+        .catch(() => null);
+      if (project) {
+        const env = await this.prisma.environment
+          .findFirst({
+            where: { key: input.environmentKey, projectId: project.id },
+            select: { id: true },
+          })
+          .catch(() => null);
+        if (env) {
+          environmentId = env.id;
+        }
+      }
+    }
+
+    if (!environmentId) {
+      throw new HttpException(
+        'environmentId (or environmentKey + projectKey) is required',
+        400,
+      );
+    }
+
     try {
+      const now = new Date();
+
       const deployment = await this.prisma.deployment.create({
         data: {
-          environmentId: input.environmentId,
+          environmentId,
           serviceId: input.serviceId ?? null,
           version: input.version,
           status: this.normalizeStatus(input.status),
           description: input.description,
           deployedBy: input.deployedBy,
+          deployedAt: now,
+          createdAt: now,
+          updatedAt: now,
         },
         include: { environment: true, service: true },
       });
@@ -96,8 +122,9 @@ export class DeploymentsService {
   }
 
   private normalizeStatus(status?: string | null): DeploymentStatus {
-    const values = Object.values(DeploymentStatus);
-    return values.includes(status as DeploymentStatus)
+    return DEPLOYMENT_STATUSES.includes(
+      status as (typeof DEPLOYMENT_STATUSES)[number],
+    )
       ? (status as DeploymentStatus)
       : DeploymentStatus.SUCCEEDED;
   }

@@ -1,49 +1,80 @@
-import { traceGroups } from '@/data/mock-data'
+import { Activity } from 'lucide-react'
+import { useErrorGroups } from '@/lib/api'
+import { useSelectedProject } from '@/hooks/use-selected-project'
+import { PageNotice } from '@/components/page-notice'
+
+function relativeTime(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins} min ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.floor(hours / 24)}d ago`
+}
 
 export function TracesPage() {
-  return (
-    <div className="space-y-6">
-      <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <article className="surface-card p-6">
-          <p className="text-sm font-semibold text-[var(--text-main)] dark:text-white">Error tracing surface</p>
-          <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
-            The real SDK ingestion path belongs here. Grouped events should feel operational, not like a developer afterthought bolted onto uptime data.
-          </p>
-        </article>
-        <article className="surface-inverse p-6">
-          <p className="text-sm font-semibold text-white/65">Top release</p>
-          <p className="mt-3 text-2xl font-semibold tracking-[-0.04em]">2026.04.12-rc2</p>
-          <p className="mt-2 text-sm text-white/60">Latest deployment associated with trace volume changes.</p>
-        </article>
-      </section>
+  const { project } = useSelectedProject()
+  const { data: groups, isLoading, isError, refetch } = useErrorGroups(project?.slug)
 
-      <section className="space-y-3">
-        {traceGroups.map((group) => (
-          <article
-            key={group.fingerprint}
-            className="surface-card p-6 transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-panel-soft)]"
-          >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <p className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-main)] dark:text-white">{group.fingerprint}</p>
-                <p className="mt-2 text-sm text-[var(--text-muted)]">
-                  {group.service} · {group.environment}
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm lg:text-right">
-                <div>
-                  <p className="text-[var(--text-muted)]">Events</p>
-                  <p className="mt-1 font-medium text-[var(--text-main)] dark:text-slate-100">{group.events}</p>
-                </div>
-                <div>
-                  <p className="text-[var(--text-muted)]">Last seen</p>
-                  <p className="mt-1 font-medium text-[var(--text-main)] dark:text-slate-100">{group.lastSeen}</p>
-                </div>
-              </div>
+  if (isLoading) {
+    return <PageNotice variant="loading" message="Loading errors…" />
+  }
+
+  if (isError) {
+    return (
+      <PageNotice
+        variant="error"
+        message="Could not reach the API."
+        onRetry={() => void refetch()}
+      />
+    )
+  }
+
+  if (!groups || groups.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Activity className="mb-4 h-10 w-10 text-[var(--text-muted)]" />
+        <p className="text-lg font-semibold text-[var(--text-main)]">No errors yet</p>
+        <p className="mt-1 max-w-sm text-center text-sm text-[var(--text-muted)]">
+          Errors ingested via the API will show up here as grouped traces.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y divide-[var(--border-soft)] border border-[var(--border-soft)]">
+      {groups.map((group) => (
+        <div
+          key={group.fingerprint}
+          className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="min-w-0">
+            <div className="flex items-center gap-3">
+              <span
+                className={`inline-block h-2 w-2 shrink-0 ${
+                  group.status === 'OPEN'
+                    ? 'bg-[var(--dot-down)]'
+                    : group.status === 'RESOLVED'
+                      ? 'bg-[var(--dot-healthy)]'
+                      : 'bg-[var(--dot-degraded)]'
+                }`}
+              />
+              <p className="truncate text-sm font-medium text-[var(--text-main)]">
+                {group.title}
+              </p>
             </div>
-          </article>
-        ))}
-      </section>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              {group.serviceName ?? 'unknown'} · {group.environmentName}
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+            <span>{group.occurrenceCount} events</span>
+            <span>{relativeTime(group.lastSeenAt)}</span>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

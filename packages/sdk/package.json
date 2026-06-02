@@ -1,0 +1,43 @@
+{
+  "name": "@watchdog/sdk",
+  "version": "0.1.0",
+  "description": "Watchdog SDK — error capture, deploy tracking, and uptime monitoring for your Node.js services.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "watchdog",
+    "observability",
+    "monitoring",
+    "errors",
+    "sdk"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^5.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonamadi/watchdog.git",
+    "directory": "packages/sdk"
+  }
+}

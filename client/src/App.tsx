@@ -2,18 +2,23 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { AppShell } from '@/components/app-shell'
-import { Button } from '@/components/ui/button'
+import { AuthProvider, useAuth } from '@/hooks/use-auth'
 import { AlertsPage } from '@/pages/alerts-page'
+import { AuthCallbackPage } from '@/pages/auth-callback-page'
+import { ConnectionsPage } from '@/pages/connections-page'
+import { DocsPage } from '@/pages/docs-page'
 import { IncidentsPage } from '@/pages/incidents-page'
+import { LoginPage } from '@/pages/login-page'
 import { MonitorsPage } from '@/pages/monitors-page'
 import { NotFoundPage } from '@/pages/not-found-page'
+import { PrivacyPage } from '@/pages/privacy-page'
+import { TermsPage } from '@/pages/terms-page'
 import { OverviewPage } from '@/pages/overview-page'
 import { SettingsPage } from '@/pages/settings-page'
 import { StatusPagesPage } from '@/pages/status-pages-page'
 import { TracesPage } from '@/pages/traces-page'
 import { useTheme } from '@/hooks/use-theme'
 
-// Lazy-loaded so GSAP/Lenis ship in a separate chunk, off the product app's path.
 const LandingPage = lazy(() =>
   import('@/pages/landing/landing-page').then((module) => ({
     default: module.LandingPage,
@@ -21,56 +26,63 @@ const LandingPage = lazy(() =>
 )
 
 const pageMeta = {
-  '/': {
-    title: 'Operational overview',
-    eyebrow: 'Workspace pulse',
-    description:
-      'A sharper control surface for uptime, incidents, and traces across the workspace, designed to keep teams oriented before pressure turns into noise.',
+  '/app/overview': {
+    title: 'Overview',
+    eyebrow: 'Workspace',
+    description: 'Uptime, monitors, and recent deploys at a glance.',
   },
-  '/monitors': {
+  '/app/monitors': {
     title: 'Monitors',
-    eyebrow: 'Coverage and cadence',
-    description:
-      'Checks are organised by service and environment so the team can see exactly what is being measured and how quickly issues are detected.',
+    eyebrow: 'Checks',
+    description: 'HTTP checks grouped by service and environment.',
   },
-  '/traces': {
+  '/app/traces': {
     title: 'Traces',
-    eyebrow: 'Error ingestion',
-    description:
-      'This is where the SDK-backed tracing workflow will live: grouped exceptions, release context, and the bridge between noisy failures and useful investigation.',
+    eyebrow: 'Errors',
+    description: 'Grouped error events ingested from your services.',
   },
-  '/incidents': {
+  '/app/incidents': {
     title: 'Incidents',
-    eyebrow: 'Response timeline',
-    description:
-      'Incidents should be easy to scan, easy to own, and easy to communicate. The timeline is the emotional center of the product.',
+    eyebrow: 'Response',
+    description: 'Active and past incidents with timeline updates.',
   },
-  '/alerts': {
-    title: 'Alert routing',
-    eyebrow: 'Delivery rules',
-    description:
-      'Alerting should feel intentional. The product needs enough routing control to be trustworthy without collapsing into an enterprise maze.',
+  '/app/alerts': {
+    title: 'Alerts',
+    eyebrow: 'Routing',
+    description: 'Delivery rules for Slack, email, and webhooks.',
   },
-  '/status-pages': {
+  '/app/status-pages': {
     title: 'Status pages',
-    eyebrow: 'External communication',
-    description:
-      'Public service communication should inherit the same calm, clear language as the rest of the product, not read like a separate tool.',
+    eyebrow: 'External',
+    description: 'Public status pages for your users.',
   },
-  '/settings': {
+  '/app/connections': {
+    title: 'Connections',
+    eyebrow: 'SDK',
+    description: 'Services connected via the Watchdog SDK.',
+  },
+  '/app/settings': {
     title: 'Settings',
-    eyebrow: 'Workspace configuration',
-    description:
-      'Workspaces, environments, and integrations need a cleaner structure now so scaling the rest of the product later stays predictable.',
+    eyebrow: 'Config',
+    description: 'Workspace, projects, and integrations.',
   },
 } as const
 
-function App() {
+const PUBLIC_ROUTES = ['/', '/login', '/auth/callback', '/privacy', '/terms', '/docs']
+
+function AppContent() {
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
+  const { state } = useAuth()
 
-  // The marketing landing page renders standalone — no product app shell.
-  if (location.pathname === '/landing') {
+  if (state.status === 'loading') {
+    return <div className="min-h-dvh bg-[var(--surface-page)]" />
+  }
+
+  if (location.pathname === '/') {
+    if (state.status === 'authenticated') {
+      return <Navigate to="/app/overview" replace />
+    }
     return (
       <Suspense
         fallback={<div className="min-h-dvh bg-[var(--surface-page)]" />}
@@ -80,10 +92,36 @@ function App() {
     )
   }
 
+  if (
+    state.status === 'unauthenticated' &&
+    !PUBLIC_ROUTES.includes(location.pathname)
+  ) {
+    return <Navigate to="/login" replace />
+  }
+
+  const isPublicMarketingRoute =
+    location.pathname === '/login' ||
+    location.pathname === '/auth/callback' ||
+    location.pathname === '/privacy' ||
+    location.pathname === '/terms' ||
+    location.pathname === '/docs'
+
+  if (isPublicMarketingRoute) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/docs" element={<DocsPage />} />
+      </Routes>
+    )
+  }
+
   const currentMeta = pageMeta[location.pathname as keyof typeof pageMeta] ?? {
     title: 'Watchdog',
     eyebrow: 'Workspace',
-    description: 'The route is outside the current product shell.',
+    description: '',
   }
 
   return (
@@ -93,27 +131,28 @@ function App() {
       description={currentMeta.description}
       theme={theme}
       onToggleTheme={toggleTheme}
-      actions={
-        <>
-          <span className="rounded-[1rem] border border-[var(--border-soft)] bg-[var(--accent-soft)] px-3 py-2 text-xs font-medium text-[var(--accent-strong)] dark:text-[var(--accent)]">
-            System status steady
-          </span>
-          <Button variant="ghost">Product brief</Button>
-        </>
-      }
     >
       <Routes>
-        <Route path="/" element={<OverviewPage />} />
-        <Route path="/monitors" element={<MonitorsPage />} />
-        <Route path="/traces" element={<TracesPage />} />
-        <Route path="/incidents" element={<IncidentsPage />} />
-        <Route path="/alerts" element={<AlertsPage />} />
-        <Route path="/status-pages" element={<StatusPagesPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/home" element={<Navigate replace to="/" />} />
+        <Route path="/app/overview" element={<OverviewPage />} />
+        <Route path="/app/monitors" element={<MonitorsPage />} />
+        <Route path="/app/traces" element={<TracesPage />} />
+        <Route path="/app/incidents" element={<IncidentsPage />} />
+        <Route path="/app/alerts" element={<AlertsPage />} />
+        <Route path="/app/status-pages" element={<StatusPagesPage />} />
+        <Route path="/app/connections" element={<ConnectionsPage />} />
+        <Route path="/app/settings" element={<SettingsPage />} />
+        <Route path="/app" element={<Navigate replace to="/app/overview" />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AppShell>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 

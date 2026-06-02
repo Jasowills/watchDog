@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { mapPrismaError } from '../shared/prisma-errors';
 import { slugify } from '../shared/slugify';
-import { fallbackProjects, fallbackWorkspace } from '../shared/fallback-data';
 import { CreateProjectInput, UpdateProjectInput } from './projects.inputs';
 
 type ProjectRecord = {
@@ -22,7 +21,9 @@ export class ProjectsService {
   async findAll(workspaceSlug?: string): Promise<ProjectRecord[]> {
     try {
       const projects = await this.prisma.project.findMany({
-        where: workspaceSlug ? { workspace: { slug: workspaceSlug } } : undefined,
+        where: workspaceSlug
+          ? { workspace: { slug: workspaceSlug } }
+          : undefined,
         orderBy: { createdAt: 'asc' },
       });
 
@@ -30,23 +31,34 @@ export class ProjectsService {
         return projects;
       }
     } catch {
-      // fall back below
+      // noop
     }
 
-    if (workspaceSlug && workspaceSlug !== fallbackWorkspace.slug) {
-      return [];
-    }
-
-    return fallbackProjects;
+    return [];
   }
 
   async create(input: CreateProjectInput): Promise<ProjectRecord> {
     try {
+      const slug = slugify(input.slug ?? input.name);
+
+      const existing = await this.prisma.project.findFirst({
+        where: { workspaceId: input.workspaceId, slug },
+      });
+      if (existing) {
+        throw new ConflictException(
+          'A project with this slug already exists in this workspace.',
+        );
+      }
+
+      const now = new Date();
+
       return await this.prisma.project.create({
         data: {
           workspaceId: input.workspaceId,
           name: input.name,
-          slug: slugify(input.slug ?? input.name),
+          slug,
+          createdAt: now,
+          updatedAt: now,
         },
       });
     } catch (error) {
@@ -58,7 +70,7 @@ export class ProjectsService {
     try {
       return await this.prisma.project.update({
         where: { id: input.id },
-        data: { name: input.name },
+        data: { name: input.name, updatedAt: new Date() },
       });
     } catch (error) {
       mapPrismaError(error);

@@ -1,10 +1,20 @@
 import { GraphQLClient, gql } from 'graphql-request'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getToken } from '@/hooks/use-auth'
 
 const endpoint =
-  import.meta.env.VITE_API_URL ?? 'http://localhost:3001/graphql'
+  import.meta.env.VITE_API_URL ?? 'http://localhost:8080/graphql'
 
-export const graphqlClient = new GraphQLClient(endpoint)
+function authFetch(input: URL | RequestInfo, init?: RequestInit) {
+  const headers = new Headers(init?.headers)
+  const token = getToken()
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+  return fetch(input, { ...init, headers })
+}
+
+export const graphqlClient = new GraphQLClient(endpoint, { fetch: authFetch })
 
 export type Workspace = {
   id: string
@@ -180,11 +190,169 @@ export function useProjects(workspaceSlug?: string) {
   })
 }
 
+export type Service = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  projectId: string
+}
+
+const SERVICES_QUERY = gql`
+  query Services($projectSlug: String) {
+    services(projectSlug: $projectSlug) {
+      id
+      name
+      slug
+      description
+      projectId
+    }
+  }
+`
+
+const ENVIRONMENTS_QUERY = gql`
+  query Environments($projectSlug: String) {
+    environments(projectSlug: $projectSlug) {
+      id
+      name
+      key
+      color
+      projectId
+    }
+  }
+`
+
+export function useServices(projectSlug?: string) {
+  return useQuery({
+    queryKey: ['services', projectSlug ?? null],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ services: Service[] }>(
+        SERVICES_QUERY,
+        { projectSlug },
+      )
+      return data.services
+    },
+  })
+}
+
+export function useEnvironments(projectSlug?: string) {
+  return useQuery({
+    queryKey: ['environments', projectSlug ?? null],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ environments: Environment[] }>(
+        ENVIRONMENTS_QUERY,
+        { projectSlug },
+      )
+      return data.environments
+    },
+  })
+}
+
+export type Notification = {
+  id: string
+  type: string
+  title: string
+  body: string | null
+  link: string | null
+  read: boolean
+  createdAt: string
+  userId: string
+  workspaceId: string
+}
+
+const NOTIFICATIONS_QUERY = gql`
+  query Notifications($workspaceId: String, $limit: Int) {
+    notifications(workspaceId: $workspaceId, limit: $limit) {
+      id
+      type
+      title
+      body
+      link
+      read
+      createdAt
+    }
+  }
+`
+
+const UNREAD_COUNT_QUERY = gql`
+  query UnreadNotificationCount {
+    unreadNotificationCount
+  }
+`
+
+const MARK_READ = gql`
+  mutation MarkNotificationRead($id: String!) {
+    markNotificationRead(id: $id)
+  }
+`
+
+const MARK_ALL_READ = gql`
+  mutation MarkAllNotificationsRead {
+    markAllNotificationsRead
+  }
+`
+
+export function useNotifications(workspaceId?: string, limit = 20) {
+  return useQuery({
+    queryKey: ['notifications', workspaceId ?? null],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{
+        notifications: Notification[]
+      }>(NOTIFICATIONS_QUERY, { workspaceId, limit })
+      return data.notifications
+    },
+  })
+}
+
+export function useUnreadCount() {
+  return useQuery({
+    queryKey: ['unreadCount'],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{
+        unreadNotificationCount: number
+      }>(UNREAD_COUNT_QUERY)
+      return data.unreadNotificationCount
+    },
+    refetchInterval: 30_000,
+  })
+}
+
+export function useMarkNotificationRead() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await graphqlClient.request(MARK_READ, { id })
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      void queryClient.invalidateQueries({ queryKey: ['unreadCount'] })
+    },
+  })
+}
+
+export function useMarkAllNotificationsRead() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      await graphqlClient.request(MARK_ALL_READ)
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      void queryClient.invalidateQueries({ queryKey: ['unreadCount'] })
+    },
+  })
+}
+
 // --- Mutations -------------------------------------------------------------
 
 export type CreateWorkspaceInput = {
   name: string
   slug?: string
+}
+
+export type UpdateWorkspaceInput = {
+  id: string
+  name: string
 }
 
 export type CreateProjectInput = {
@@ -253,6 +421,12 @@ const CREATE_WORKSPACE = gql`
   }
 `
 
+const UPDATE_WORKSPACE = gql`
+  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {
+    updateWorkspace(input: $input) { id name slug }
+  }
+`
+
 const CREATE_PROJECT = gql`
   mutation CreateProject($input: CreateProjectInput!) {
     createProject(input: $input) { id name slug workspaceId }
@@ -298,6 +472,22 @@ export function useCreateWorkspace() {
         { input },
       )
       return data.createWorkspace
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['workspaces'] })
+    },
+  })
+}
+
+export function useUpdateWorkspace() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: UpdateWorkspaceInput) => {
+      const data = await graphqlClient.request<{ updateWorkspace: Workspace }>(
+        UPDATE_WORKSPACE,
+        { input },
+      )
+      return data.updateWorkspace
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['workspaces'] })
@@ -402,6 +592,232 @@ export function useDeleteMonitor() {
   })
 }
 
+// --- Incidents -------------------------------------------------------------
+
+export type Incident = {
+  id: string
+  title: string
+  summary: string | null
+  severity: string
+  status: string
+  startedAt: string
+  resolvedAt: string | null
+  createdAt: string
+  workspaceId: string
+  projectId: string
+  environmentId: string | null
+  serviceId: string | null
+  ownerUserId: string | null
+}
+
+const INCIDENTS_QUERY = gql`
+  query Incidents {
+    incidents {
+      id
+      title
+      summary
+      severity
+      status
+      startedAt
+      resolvedAt
+      createdAt
+      workspaceId
+      projectId
+      environmentId
+      serviceId
+      ownerUserId
+    }
+  }
+`
+
+export function useIncidents() {
+  return useQuery({
+    queryKey: ['incidents'],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ incidents: Incident[] }>(
+        INCIDENTS_QUERY,
+      )
+      return data.incidents
+    },
+  })
+}
+
+// --- Alerts ----------------------------------------------------------------
+
+export type AlertChannel = {
+  id: string
+  name: string
+  type: string
+  destination: string
+  secretRef: string | null
+  isEnabled: boolean
+  createdAt: string
+  updatedAt: string
+  workspaceId: string
+  creatorUserId: string | null
+}
+
+export type AlertRule = {
+  id: string
+  name: string
+  triggerType: string
+  minimumSeverity: string | null
+  isEnabled: boolean
+  createdAt: string
+  updatedAt: string
+  workspaceId: string
+  projectId: string | null
+  environmentId: string | null
+  serviceId: string | null
+  alertChannelId: string
+}
+
+const ALERT_CHANNELS_QUERY = gql`
+  query AlertChannels {
+    alertChannels {
+      id
+      name
+      type
+      destination
+      secretRef
+      isEnabled
+      workspaceId
+    }
+  }
+`
+
+const ALERT_RULES_QUERY = gql`
+  query AlertRules {
+    alertRules {
+      id
+      name
+      triggerType
+      minimumSeverity
+      isEnabled
+      workspaceId
+      projectId
+      environmentId
+      serviceId
+      alertChannelId
+    }
+  }
+`
+
+export function useAlertChannels() {
+  return useQuery({
+    queryKey: ['alertChannels'],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{
+        alertChannels: AlertChannel[]
+      }>(ALERT_CHANNELS_QUERY)
+      return data.alertChannels
+    },
+  })
+}
+
+export function useAlertRules() {
+  return useQuery({
+    queryKey: ['alertRules'],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ alertRules: AlertRule[] }>(
+        ALERT_RULES_QUERY,
+      )
+      return data.alertRules
+    },
+  })
+}
+
+// --- Status Pages ----------------------------------------------------------
+
+export type StatusPage = {
+  id: string
+  name: string
+  slug: string
+  headline: string | null
+  visibility: string
+  createdAt: string
+  updatedAt: string
+  workspaceId: string
+  projectId: string | null
+}
+
+const STATUS_PAGES_QUERY = gql`
+  query StatusPages {
+    statusPages {
+      id
+      name
+      slug
+      headline
+      visibility
+      workspaceId
+      projectId
+    }
+  }
+`
+
+export function useStatusPages() {
+  return useQuery({
+    queryKey: ['statusPages'],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{
+        statusPages: StatusPage[]
+      }>(STATUS_PAGES_QUERY)
+      return data.statusPages
+    },
+  })
+}
+
+// --- Errors / Traces -------------------------------------------------------
+
+export type ErrorGroupStatus = 'OPEN' | 'RESOLVED' | 'IGNORED'
+
+export type ErrorGroup = {
+  id: string
+  fingerprint: string
+  title: string
+  status: ErrorGroupStatus
+  occurrenceCount: number
+  firstSeenAt: string
+  lastSeenAt: string
+  projectId: string
+  environmentId: string
+  serviceId: string | null
+  environmentName: string
+  serviceName: string | null
+}
+
+const ERROR_GROUPS_QUERY = gql`
+  query ErrorGroups($projectSlug: String, $environmentKey: String, $serviceId: String, $limit: Int) {
+    errorGroups(projectSlug: $projectSlug, environmentKey: $environmentKey, serviceId: $serviceId, limit: $limit) {
+      id
+      fingerprint
+      title
+      status
+      occurrenceCount
+      firstSeenAt
+      lastSeenAt
+      projectId
+      environmentId
+      serviceId
+      environmentName
+      serviceName
+    }
+  }
+`
+
+export function useErrorGroups(projectSlug?: string, environmentKey?: string) {
+  return useQuery({
+    queryKey: ['errorGroups', projectSlug ?? null, environmentKey ?? null],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ errorGroups: ErrorGroup[] }>(
+        ERROR_GROUPS_QUERY,
+        { projectSlug, environmentKey },
+      )
+      return data.errorGroups
+    },
+  })
+}
+
 // --- Deployments -----------------------------------------------------------
 
 export type DeploymentStatus =
@@ -490,6 +906,266 @@ export function useRecordDeployment() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['deployments'] })
+    },
+  })
+}
+
+// --- API Keys -------------------------------------------------------------
+
+export type ApiKey = {
+  id: string
+  name: string
+  prefix: string
+  lastUsedAt: string | null
+  expiresAt: string | null
+  isRevoked: boolean
+  createdAt: string
+  projectId: string
+}
+
+export type ApiKeyWithSecret = ApiKey & { key: string }
+
+export type CreateApiKeyInput = {
+  projectId: string
+  name: string
+  expiresAt?: string
+}
+
+const API_KEYS_QUERY = gql`
+  query ApiKeys($projectId: String!) {
+    apiKeys(projectId: $projectId) {
+      id
+      name
+      prefix
+      lastUsedAt
+      expiresAt
+      isRevoked
+      createdAt
+      projectId
+    }
+  }
+`
+
+const CREATE_API_KEY = gql`
+  mutation CreateApiKey($input: CreateApiKeyInput!) {
+    createApiKey(input: $input) {
+      id
+      name
+      prefix
+      key
+      expiresAt
+      isRevoked
+      createdAt
+      projectId
+    }
+  }
+`
+
+const REVOKE_API_KEY = gql`
+  mutation RevokeApiKey($input: RevokeApiKeyInput!) {
+    revokeApiKey(input: $input) {
+      id
+      name
+      prefix
+      isRevoked
+      projectId
+    }
+  }
+`
+
+export function useApiKeys(projectId: string) {
+  return useQuery({
+    queryKey: ['apiKeys', projectId],
+    queryFn: async () => {
+      const data = await graphqlClient.request<{ apiKeys: ApiKey[] }>(
+        API_KEYS_QUERY,
+        { projectId },
+      )
+      return data.apiKeys
+    },
+    enabled: !!projectId,
+  })
+}
+
+export function useCreateApiKey() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: CreateApiKeyInput) => {
+      const data = await graphqlClient.request<{ createApiKey: ApiKeyWithSecret }>(
+        CREATE_API_KEY,
+        { input },
+      )
+      return data.createApiKey
+    },
+    onSuccess: (result) => {
+      void queryClient.invalidateQueries({ queryKey: ['apiKeys', result.projectId] })
+    },
+  })
+}
+
+export function useRevokeApiKey() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; projectId: string }) => {
+      const data = await graphqlClient.request<{ revokeApiKey: ApiKey }>(
+        REVOKE_API_KEY,
+        { input: { id: input.id } },
+      )
+      return data.revokeApiKey
+    },
+    onSuccess: (_data, vars) => {
+      void queryClient.invalidateQueries({ queryKey: ['apiKeys', vars.projectId] })
+    },
+  })
+}
+
+// --- Wired-up missing mutations ------------------------------------------
+
+export type UpdateProjectInput = {
+  id: string
+  name?: string
+}
+
+const UPDATE_PROJECT = gql`
+  mutation UpdateProject($input: UpdateProjectInput!) {
+    updateProject(input: $input) { id name slug workspaceId }
+  }
+`
+
+export function useUpdateProject() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: UpdateProjectInput) => {
+      const data = await graphqlClient.request<{ updateProject: Project }>(
+        UPDATE_PROJECT,
+        { input },
+      )
+      return data.updateProject
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+    },
+  })
+}
+
+const DELETE_PROJECT = gql`
+  mutation DeleteProject($id: String!) {
+    deleteProject(id: $id)
+  }
+`
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const data = await graphqlClient.request<{ deleteProject: boolean }>(
+        DELETE_PROJECT,
+        { id },
+      )
+      return data.deleteProject
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['projects'] })
+    },
+  })
+}
+
+export type UpdateEnvironmentInput = {
+  id: string
+  name?: string
+  color?: string
+}
+
+const UPDATE_ENVIRONMENT = gql`
+  mutation UpdateEnvironment($input: UpdateEnvironmentInput!) {
+    updateEnvironment(input: $input) { id name key color projectId }
+  }
+`
+
+const DELETE_ENVIRONMENT = gql`
+  mutation DeleteEnvironment($id: String!) {
+    deleteEnvironment(id: $id)
+  }
+`
+
+export function useUpdateEnvironment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: UpdateEnvironmentInput) => {
+      const data = await graphqlClient.request<{ updateEnvironment: Environment }>(
+        UPDATE_ENVIRONMENT,
+        { input },
+      )
+      return data.updateEnvironment
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['environments'] })
+    },
+  })
+}
+
+export function useDeleteEnvironment() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const data = await graphqlClient.request<{ deleteEnvironment: boolean }>(
+        DELETE_ENVIRONMENT,
+        { id },
+      )
+      return data.deleteEnvironment
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['environments'] })
+    },
+  })
+}
+
+export type UpdateServiceInput = {
+  id: string
+  name?: string
+  description?: string
+}
+
+const UPDATE_SERVICE = gql`
+  mutation UpdateService($input: UpdateServiceInput!) {
+    updateService(input: $input) { id name slug description projectId }
+  }
+`
+
+const DELETE_SERVICE = gql`
+  mutation DeleteService($id: String!) {
+    deleteService(id: $id)
+  }
+`
+
+export function useUpdateService() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: UpdateServiceInput) => {
+      const data = await graphqlClient.request<{ updateService: unknown }>(
+        UPDATE_SERVICE,
+        { input },
+      )
+      return data.updateService
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['services'] })
+    },
+  })
+}
+
+export function useDeleteService() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const data = await graphqlClient.request<{ deleteService: boolean }>(
+        DELETE_SERVICE,
+        { id },
+      )
+      return data.deleteService
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['services'] })
     },
   })
 }

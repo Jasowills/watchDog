@@ -15,7 +15,7 @@ The client is a Vite-based React application for the Watchdog product surface.
 npm run dev
 ```
 
-By default the client expects the GraphQL API at `http://localhost:3001/graphql`.
+By default the client expects the GraphQL API at `http://localhost:8080/graphql`.
 
 ## Notes
 

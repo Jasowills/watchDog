@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { mapPrismaError } from '../shared/prisma-errors';
-import { fallbackMonitors, fallbackProjects } from '../shared/fallback-data';
 import { MonitorModel } from './models/monitor.model';
 import { CreateMonitorInput, UpdateMonitorInput } from './monitors.inputs';
 
@@ -56,23 +55,16 @@ export class MonitorsService {
         return monitors.map((monitor) => this.toView(monitor));
       }
     } catch {
-      // fall back below
+      // noop
     }
 
-    if (projectSlug && projectSlug !== fallbackProjects[0].slug) {
-      return [];
-    }
-
-    return fallbackMonitors
-      .filter(
-        (monitor) =>
-          !environmentKey || monitor.environment.key === environmentKey,
-      )
-      .map((monitor) => this.toView(monitor));
+    return [];
   }
 
   async create(input: CreateMonitorInput): Promise<MonitorModel> {
     try {
+      const now = new Date();
+
       const monitor = await this.prisma.monitor.create({
         data: {
           serviceId: input.serviceId,
@@ -84,6 +76,8 @@ export class MonitorsService {
           expectedKeyword: input.expectedKeyword,
           intervalSeconds: input.intervalSeconds,
           timeoutSeconds: input.timeoutSeconds,
+          createdAt: now,
+          updatedAt: now,
         },
         include: monitorInclude,
       });
@@ -107,6 +101,7 @@ export class MonitorsService {
           intervalSeconds: input.intervalSeconds,
           timeoutSeconds: input.timeoutSeconds,
           isActive: input.isActive,
+          updatedAt: new Date(),
         },
         include: monitorInclude,
       });

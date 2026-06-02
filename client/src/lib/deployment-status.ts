@@ -6,10 +6,10 @@ type DeploymentStatusMeta = {
 }
 
 const META: Record<DeploymentStatus, DeploymentStatusMeta> = {
-  SUCCEEDED: { label: 'Succeeded', dotClass: 'bg-[oklch(0.72_0.17_152)]' },
-  IN_PROGRESS: { label: 'In progress', dotClass: 'bg-[var(--text-muted)]' },
-  ROLLED_BACK: { label: 'Rolled back', dotClass: 'bg-[oklch(0.78_0.16_75)]' },
-  FAILED: { label: 'Failed', dotClass: 'bg-[oklch(0.62_0.22_22)]' },
+  SUCCEEDED: { label: 'Succeeded', dotClass: 'bg-[var(--dot-healthy)]' },
+  IN_PROGRESS: { label: 'In progress', dotClass: 'bg-[var(--dot-degraded)]' },
+  ROLLED_BACK: { label: 'Rolled back', dotClass: 'bg-[var(--dot-degraded)]' },
+  FAILED: { label: 'Failed', dotClass: 'bg-[var(--dot-down)]' },
 }
 
 export function deploymentStatusMeta(

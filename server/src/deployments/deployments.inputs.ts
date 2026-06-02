@@ -1,10 +1,16 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { DeploymentStatus } from '@prisma/client';
+import { DeploymentStatus } from './models/deployment.model';
 
 @InputType()
 export class RecordDeploymentInput {
-  @Field()
-  environmentId!: string;
+  @Field({ nullable: true })
+  environmentId?: string;
+
+  @Field({ nullable: true })
+  environmentKey?: string;
+
+  @Field({ nullable: true })
+  projectKey?: string;
 
   @Field({ nullable: true })
   serviceId?: string;

@@ -27,9 +27,9 @@ npm run dev
 
 By default:
 
-- client: `http://localhost:5173`
-- server: `http://localhost:3001`
-- GraphQL: `http://localhost:3001/graphql`
+- client: `http://localhost:3000`
+- server: `http://localhost:8080`
+- GraphQL: `http://localhost:8080/graphql`
 
 ## Product Modules
 

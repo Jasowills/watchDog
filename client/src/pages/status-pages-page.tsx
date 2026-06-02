@@ -1,40 +1,66 @@
-import { statusServices } from '@/data/mock-data'
+import { AlertTriangle, LifeBuoy } from 'lucide-react'
+import { useStatusPages } from '@/lib/api'
 
 export function StatusPagesPage() {
-  return (
-    <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-      <section className="surface-card p-6">
-        <p className="text-sm font-semibold text-[var(--text-main)] dark:text-white">Communication model</p>
-        <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
-          Status pages should read like clear operator communication, not like an afterthought generated from internal data.
+  const { data: statusPages, isLoading, error } = useStatusPages()
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <p className="text-sm text-[var(--text-muted)]">Loading status pages…</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <AlertTriangle className="mb-4 h-10 w-10 text-[var(--text-muted)]" />
+        <p className="text-lg font-semibold text-[var(--text-main)]">Failed to load status pages</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          {error instanceof Error ? error.message : 'An unexpected error occurred.'}
         </p>
-        <ul className="mt-5 space-y-3 text-sm leading-6 text-[var(--text-muted)]">
-          <li>Public summary for external stakeholders.</li>
-          <li>Maintenance windows and incident updates on the same timeline.</li>
-          <li>Service state badges that map cleanly to internal incident states.</li>
-        </ul>
-      </section>
+      </div>
+    )
+  }
 
-      <section className="surface-inverse p-6 shadow-[0_18px_50px_color-mix(in_oklch,var(--surface-inverse)_14%,transparent)]">
-        <div className="border-b border-white/10 pb-4">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-white/45">Status preview</p>
-          <h2 className="mt-3 font-[var(--font-display)] text-3xl tracking-[-0.04em] text-white">Acorn platform status</h2>
-          <p className="mt-2 text-sm text-white/65">Current system status and recent updates.</p>
-        </div>
+  if (!statusPages || statusPages.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <LifeBuoy className="mb-4 h-10 w-10 text-[var(--text-muted)]" />
+        <p className="text-lg font-semibold text-[var(--text-main)]">No status pages</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Create a public status page to communicate with your users.
+        </p>
+      </div>
+    )
+  }
 
-        <div className="mt-5 space-y-3">
-          {statusServices.map((service) => (
-            <div
-              key={service.name}
-              className="flex items-center justify-between rounded-[1rem] border border-white/10 px-4 py-4"
-            >
-              <p className="font-medium text-white">{service.name}</p>
-              <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-medium text-white/80">
-                {service.state}
-              </span>
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <div className="divide-y divide-[var(--border-soft)] border border-[var(--border-soft)]">
+        {statusPages.map((page) => (
+          <div
+            key={page.id}
+            className="flex items-start justify-between gap-4 px-5 py-4"
+          >
+            <div>
+              <p className="text-sm font-medium text-[var(--text-main)]">{page.name}</p>
+              <p className="text-xs text-[var(--text-muted)]">{page.slug}</p>
             </div>
-          ))}
-        </div>
+            <span className="border border-[var(--border-soft)] bg-[var(--surface-panel-soft)] px-2 py-1 text-xs text-[var(--text-muted)]">
+              {page.visibility}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <section className="border border-[var(--border-soft)] p-5">
+        <p className="text-sm font-semibold text-[var(--text-main)]">About status pages</p>
+        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
+          Public status pages show real-time service state for your users. Each page
+          maps to a dedicated subdomain and can display the health of selected services.
+        </p>
       </section>
     </div>
   )

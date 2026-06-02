@@ -1,12 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { mapPrismaError } from '../shared/prisma-errors';
-import { slugify } from '../shared/slugify';
-import {
-  fallbackEnvironments,
-  fallbackProjects,
-} from '../shared/fallback-data';
 import {
   CreateEnvironmentInput,
   UpdateEnvironmentInput,
@@ -35,24 +30,33 @@ export class EnvironmentsService {
         return environments;
       }
     } catch {
-      // fall back below
+      // noop
     }
 
-    if (projectSlug && projectSlug !== fallbackProjects[0].slug) {
-      return [];
-    }
-
-    return fallbackEnvironments;
+    return [];
   }
 
   async create(input: CreateEnvironmentInput): Promise<EnvironmentRecord> {
     try {
+      const existing = await this.prisma.environment.findFirst({
+        where: { projectId: input.projectId, key: input.key },
+      });
+      if (existing) {
+        throw new ConflictException(
+          'An environment with this key already exists in this project.',
+        );
+      }
+
+      const now = new Date();
+
       return await this.prisma.environment.create({
         data: {
           projectId: input.projectId,
           name: input.name,
-          key: slugify(input.key ?? input.name),
+          key: input.key,
           color: input.color,
+          createdAt: now,
+          updatedAt: now,
         },
       });
     } catch (error) {
@@ -64,7 +68,7 @@ export class EnvironmentsService {
     try {
       return await this.prisma.environment.update({
         where: { id: input.id },
-        data: { name: input.name, color: input.color },
+        data: { name: input.name, color: input.color, updatedAt: new Date() },
       });
     } catch (error) {
       mapPrismaError(error);

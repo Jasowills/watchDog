@@ -8,7 +8,7 @@ import { DeploymentsService } from './deployments.service';
  * REST ingestion endpoint so CI pipelines can record a deployment with a
  * simple POST — no GraphQL client needed.
  *
- *   curl -X POST http://localhost:3001/ingest/deployments \
+ *   curl -X POST http://localhost:8080/ingest/deployments \
  *     -H 'content-type: application/json' \
  *     -d '{"environmentId":"env_production","version":"api@2026.5.21"}'
  */

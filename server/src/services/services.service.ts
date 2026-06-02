@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { mapPrismaError } from '../shared/prisma-errors';
 import { slugify } from '../shared/slugify';
-import { fallbackProjects, fallbackServices } from '../shared/fallback-data';
 import { ServiceModel } from './models/service.model';
 import { CreateServiceInput, UpdateServiceInput } from './services.inputs';
 
@@ -22,24 +21,35 @@ export class ServicesService {
         return services;
       }
     } catch {
-      // fall back below
+      // noop
     }
 
-    if (projectSlug && projectSlug !== fallbackProjects[0].slug) {
-      return [];
-    }
-
-    return fallbackServices;
+    return [];
   }
 
   async create(input: CreateServiceInput): Promise<ServiceModel> {
     try {
+      const slug = slugify(input.slug ?? input.name);
+
+      const existing = await this.prisma.service.findFirst({
+        where: { projectId: input.projectId, slug },
+      });
+      if (existing) {
+        throw new ConflictException(
+          'A service with this slug already exists in this project.',
+        );
+      }
+
+      const now = new Date();
+
       return await this.prisma.service.create({
         data: {
           projectId: input.projectId,
           name: input.name,
-          slug: slugify(input.slug ?? input.name),
+          slug,
           description: input.description,
+          createdAt: now,
+          updatedAt: now,
         },
       });
     } catch (error) {
@@ -51,7 +61,11 @@ export class ServicesService {
     try {
       return await this.prisma.service.update({
         where: { id: input.id },
-        data: { name: input.name, description: input.description },
+        data: {
+          name: input.name,
+          description: input.description,
+          updatedAt: new Date(),
+        },
       });
     } catch (error) {
       mapPrismaError(error);

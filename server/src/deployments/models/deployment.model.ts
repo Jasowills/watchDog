@@ -1,5 +1,11 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { DeploymentStatus } from '@prisma/client';
+
+export enum DeploymentStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUCCEEDED = 'SUCCEEDED',
+  FAILED = 'FAILED',
+  ROLLED_BACK = 'ROLLED_BACK',
+}
 
 registerEnumType(DeploymentStatus, {
   name: 'DeploymentStatus',

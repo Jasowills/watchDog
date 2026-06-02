@@ -8,3 +8,12 @@ export class CreateWorkspaceInput {
   @Field({ nullable: true })
   slug?: string;
 }
+
+@InputType()
+export class UpdateWorkspaceInput {
+  @Field()
+  id!: string;
+
+  @Field()
+  name!: string;
+}

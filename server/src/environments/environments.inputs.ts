@@ -8,8 +8,8 @@ export class CreateEnvironmentInput {
   @Field()
   name!: string;
 
-  @Field({ nullable: true })
-  key?: string;
+  @Field()
+  key!: string;
 
   @Field({ nullable: true })
   color?: string;

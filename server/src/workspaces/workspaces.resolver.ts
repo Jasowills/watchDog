@@ -1,7 +1,10 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { WorkspaceModel } from './models/workspace.model';
-import { CreateWorkspaceInput } from './workspaces.inputs';
+import {
+  CreateWorkspaceInput,
+  UpdateWorkspaceInput,
+} from './workspaces.inputs';
 import { WorkspacesService } from './workspaces.service';
 
 @Resolver(() => WorkspaceModel)
@@ -18,5 +21,12 @@ export class WorkspacesResolver {
     @Args('input') input: CreateWorkspaceInput,
   ): Promise<WorkspaceModel> {
     return this.workspacesService.create(input);
+  }
+
+  @Mutation(() => WorkspaceModel)
+  updateWorkspace(
+    @Args('input') input: UpdateWorkspaceInput,
+  ): Promise<WorkspaceModel> {
+    return this.workspacesService.update(input);
   }
 }

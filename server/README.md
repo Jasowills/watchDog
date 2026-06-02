@@ -15,7 +15,7 @@ The server is a NestJS application that will own the GraphQL API, authentication
 npm run start:dev
 ```
 
-The server defaults to port `3001`.
+The server defaults to port `8080`.
 
 ## Direction
 

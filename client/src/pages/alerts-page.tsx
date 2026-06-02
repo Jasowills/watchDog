@@ -1,38 +1,64 @@
-import { alertChannels } from '@/data/mock-data'
+import { AlertTriangle, BellRing } from 'lucide-react'
+import { useAlertChannels } from '@/lib/api'
 
 export function AlertsPage() {
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="space-y-3">
-        {alertChannels.map((channel) => (
-          <article
-            key={channel.name}
-            className="surface-card p-6 transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-panel-soft)]"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-lg font-semibold tracking-[-0.03em] text-[var(--text-main)] dark:text-white">{channel.name}</p>
-                <p className="mt-2 text-sm text-[var(--text-muted)]">{channel.scope}</p>
-              </div>
-              <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-xs font-medium text-[var(--accent-strong)] dark:text-[var(--accent)]">
-                {channel.type}
-              </span>
-            </div>
-          </article>
-        ))}
-      </section>
+  const { data: channels, isLoading, error } = useAlertChannels()
 
-      <section className="surface-inverse p-6">
-        <p className="text-sm font-semibold text-white/65">Routing principle</p>
-        <p className="mt-3 text-sm leading-6 text-white/68">
-          Alerts should travel with intent. Production failures escalate fast, staging noise stays visible without becoming another source of fatigue.
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <p className="text-sm text-[var(--text-muted)]">Loading alert channels…</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <AlertTriangle className="mb-4 h-10 w-10 text-[var(--text-muted)]" />
+        <p className="text-lg font-semibold text-[var(--text-main)]">Failed to load alert channels</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          {error instanceof Error ? error.message : 'An unexpected error occurred.'}
         </p>
-        <ul className="mt-5 space-y-3 text-sm leading-6 text-white/64">
-          <li>Production incidents route to Slack immediately.</li>
-          <li>Error bursts can fan out to email digests when they cross defined thresholds.</li>
-          <li>Webhooks stay available for teams that need their own orchestration path.</li>
-        </ul>
-      </section>
+      </div>
+    )
+  }
+
+  if (!channels || channels.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <BellRing className="mb-4 h-10 w-10 text-[var(--text-muted)]" />
+        <p className="text-lg font-semibold text-[var(--text-main)]">No alert channels</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Configure Slack, email, or webhook channels to route alerts.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y divide-[var(--border-soft)] border border-[var(--border-soft)]">
+      {channels.map((channel) => (
+        <div
+          key={channel.id}
+          className="flex items-start justify-between gap-4 px-5 py-4"
+        >
+          <div>
+            <p className="text-sm font-medium text-[var(--text-main)]">{channel.name}</p>
+            <p className="text-xs text-[var(--text-muted)]">{channel.destination}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2 w-2 rounded-full ${
+                channel.isEnabled ? 'bg-[var(--dot-healthy)]' : 'bg-[var(--dot-down)]'
+              }`}
+            />
+            <span className="border border-[var(--border-soft)] bg-[var(--surface-panel-soft)] px-2 py-1 text-xs text-[var(--text-muted)]">
+              {channel.type}
+            </span>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
