@@ -77,7 +77,7 @@ export function LogoFull({ className }: { className?: string }) {
           x="178" y="78"
           className="fill-[var(--text-main)]"
           style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 500, fontSize: 22, letterSpacing: 8 }}
-        >WATCHDOG</text>
+        >SONAR</text>
         <text
           x="178" y="98"
           className="fill-[var(--text-soft)]"

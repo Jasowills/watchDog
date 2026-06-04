@@ -139,7 +139,7 @@ function AppContent() {
   }
 
   const currentMeta = pageMeta[location.pathname] ?? {
-    title: 'Watchdog',
+    title: 'Sonar',
     eyebrow: 'Workspace',
     description: '',
   }

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import express from 'express'
 import { monitorRouter } from './routes/monitor-routes.js'
 import { triggerRouter } from './routes/trigger-routes.js'
-import { watchdog, checkSdkStatus } from './watchdog.js'
+import { sonar, checkSdkStatus } from './sonar.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PORT = parseInt(process.env.PORT ?? '3001', 10)
@@ -35,9 +35,9 @@ app.listen(PORT, async () => {
   console.log(`  trigger urls   → http://localhost:${PORT}/trigger/*`)
   const sdk = await checkSdkStatus()
   if (sdk.ok) {
-    console.log(`  watchdog SDK   → ${sdk.message}`)
+    console.log(`  Sonar SDK   → ${sdk.message}`)
   } else {
-    console.log(`  watchdog SDK   → ${sdk.message}`)
+    console.log(`  Sonar SDK   → ${sdk.message}`)
   }
   console.log()
 })

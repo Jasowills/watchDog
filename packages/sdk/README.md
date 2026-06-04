@@ -1,35 +1,35 @@
-# @watchdog/sdk
+# @sonar/sdk
 
-Official Node.js SDK for [Watchdog](https://watchdog.dev) — error capture, deploy tracking, and uptime monitoring.
+Official Node.js SDK for [Sonar](https://sonar.app) — error capture, deploy tracking, and uptime monitoring.
 
 ## Installation
 
 ```bash
-npm install @watchdog/sdk
+npm install @sonar/sdk
 ```
 
 ## Usage
 
 ```typescript
-import Watchdog from '@watchdog/sdk'
+import Sonar from '@sonar/sdk'
 
-const wd = new Watchdog({
-  projectKey: process.env.WATCHDOG_PROJECT_KEY!,
-  environment: process.env.WATCHDOG_ENVIRONMENT || 'development',
+const sonar = new Sonar({
+  projectKey: process.env.SONAR_PROJECT_KEY!,
+  environment: process.env.SONAR_ENVIRONMENT || 'development',
 })
 
 // Capture an error
 try {
   await processOrder(data)
 } catch (err) {
-  wd.captureError(err, {
+  sonar.captureError(err, {
     fingerprint: 'OrderProcessingError',
     metadata: { orderId: data.id },
   })
 }
 
 // Track a deployment
-await wd.recordDeployment({
+await sonar.recordDeployment({
   version: 'v1.2.3',
   status: 'succeeded',
   description: 'Release candidate 3',
@@ -37,27 +37,27 @@ await wd.recordDeployment({
 })
 
 // Auto-capture uncaught exceptions and rejections
-wd.setupGlobalHandlers()
+sonar.setupGlobalHandlers()
 
 // Express error middleware
-app.use(wd.middleware())
+app.use(sonar.middleware())
 ```
 
 ## API
 
-### `new Watchdog(options)`
+### `new Sonar(options)`
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `projectKey` | `string` | required | Your Watchdog project ID |
+| `projectKey` | `string` | required | Your Sonar project ID |
 | `environment` | `string` | required | e.g. `production`, `staging` |
 | `release` | `string` | `undefined` | Current release version |
 | `captureUser` | `boolean` | `false` | Attach environment context |
-| `endpoint` | `string` | `https://api.watchdog.dev` | API base URL |
+| `endpoint` | `string` | `https://api.sonar.app` | API base URL |
 
 ### `captureError(error, options?)`
 
-Send an error to Watchdog. Errors with the same fingerprint are grouped automatically.
+Send an error to Sonar. Errors with the same fingerprint are grouped automatically.
 
 ### `recordDeployment(options)`
 

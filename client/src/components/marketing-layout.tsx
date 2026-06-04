@@ -22,7 +22,7 @@ export function MarketingLayout({
           <Link to="/" className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-7" />
             <span className="text-sm font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-              Watchdog
+              Sonar
             </span>
           </Link>
 
@@ -56,7 +56,7 @@ export function MarketingLayout({
             <div className="flex items-center gap-2.5">
               <LogoMark className="h-7 w-7" />
               <span className="text-sm font-semibold text-[var(--text-main)]">
-                Watchdog
+                Sonar
               </span>
             </div>
             <p className="max-w-xs text-xs leading-6 text-[var(--text-muted)]">
@@ -151,7 +151,7 @@ export function MarketingLayout({
         </div>
 
         <div className="mx-auto mt-12 max-w-6xl border-t border-[var(--border-soft)] pt-8 text-center text-xs text-[var(--text-muted)]">
-          &copy; {new Date().getFullYear()} Watchdog. All rights reserved.
+          &copy; {new Date().getFullYear()} Sonar. All rights reserved.
         </div>
       </footer>
     </div>

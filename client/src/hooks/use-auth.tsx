@@ -5,7 +5,7 @@ import {
   type ReactNode,
 } from 'react'
 
-const STORAGE_KEY = 'watchdog_token'
+const STORAGE_KEY = 'sonar_token'
 
 type User = {
   sub: string

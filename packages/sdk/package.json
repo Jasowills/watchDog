@@ -1,7 +1,7 @@
 {
-  "name": "@watchdog/sdk",
+  "name": "@sonar/sdk",
   "version": "0.1.0",
-  "description": "Watchdog SDK — error capture, deploy tracking, and uptime monitoring for your Node.js services.",
+  "description": "Sonar SDK — error capture, deploy tracking, and uptime monitoring for your Node.js services.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
-    "watchdog",
+    "sonar",
     "observability",
     "monitoring",
     "errors",
@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jasonamadi/watchdog.git",
+    "url": "https://github.com/jasonamadi/sonar.git",
     "directory": "packages/sdk"
   }
 }

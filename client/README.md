@@ -1,6 +1,6 @@
-# Watchdog Client
+# Sonar Client
 
-The client is a Vite-based React application for the Watchdog product surface.
+The client is a Vite-based React application for the Sonar product surface.
 
 ## Stack
 
@@ -19,6 +19,6 @@ By default the client expects the GraphQL API at `http://localhost:8080/graphql`
 
 ## Notes
 
-- The current starter keeps the product light-first with a darker operational surface where it adds contrast.
+- The product uses a deep black dark mode by default, with light mode support.
 - Aliases use `@/` for app imports.
 - Shared UI primitives live under `src/components/ui`.

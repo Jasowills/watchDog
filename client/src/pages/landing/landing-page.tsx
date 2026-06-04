@@ -96,7 +96,7 @@ const steps = [
   {
     n: '02',
     title: 'Watch',
-    body: 'Watchdog checks, traces, and correlates around the clock — quietly, without noise.',
+    body: 'Sonar checks, traces, and correlates around the clock — quietly, without noise.',
   },
   {
     n: '03',
@@ -112,7 +112,7 @@ function Nav({ onNavigate }: { onNavigate: (target: string) => void }) {
         <div className="flex items-center gap-2.5">
           <LogoMark className="h-7 w-7" />
           <span className="text-sm font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-            Watchdog
+            Sonar
           </span>
         </div>
 
@@ -190,7 +190,7 @@ function Hero({ onNavigate }: { onNavigate: (target: string) => void }) {
           data-hero-item
           className="mx-auto mt-6 max-w-xl text-base leading-7 text-[var(--text-muted)] lg:text-lg"
         >
-          Watchdog unifies uptime checks, error tracing, alerting, and incident
+          Sonar unifies uptime checks, error tracing, alerting, and incident
           response on one quiet operational surface — so a three-person team can
           run like a platform org.
         </p>
@@ -469,7 +469,7 @@ function Footer({ onNavigate }: { onNavigate: (target: string) => void }) {
           <div className="flex items-center gap-2.5">
               <LogoMark className="h-7 w-7" />
             <span className="text-sm font-semibold text-[var(--text-main)]">
-              Watchdog
+              Sonar
             </span>
           </div>
           <p className="max-w-xs text-xs leading-6 text-[var(--text-muted)]">
@@ -563,7 +563,7 @@ function Footer({ onNavigate }: { onNavigate: (target: string) => void }) {
       </div>
 
       <div className="mx-auto mt-12 max-w-6xl border-t border-[var(--border-soft)] pt-8 text-center text-xs text-[var(--text-muted)]">
-        &copy; {new Date().getFullYear()} Watchdog. All rights reserved.
+        &copy; {new Date().getFullYear()} Sonar. All rights reserved.
       </div>
     </footer>
   )

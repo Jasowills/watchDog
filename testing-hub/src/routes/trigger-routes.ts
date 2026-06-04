@@ -1,23 +1,23 @@
 import { type Request, type Response, Router } from 'express'
-import { watchdog } from '../watchdog.js'
+import { sonar } from '../sonar.js'
 
 export const triggerRouter = Router()
 
-function requireWatchdog(_req: Request, res: Response, next: () => void) {
-  if (!watchdog) {
-    res.status(400).json({ ok: false, message: 'WATCHDOG_PROJECT_KEY and WATCHDOG_ENVIRONMENT_KEY must be set in .env' })
+function requireSonar(_req: Request, res: Response, next: () => void) {
+  if (!sonar) {
+    res.status(400).json({ ok: false, message: 'SONAR_PROJECT_KEY and SONAR_ENVIRONMENT_KEY must be set in .env' })
     return
   }
   next()
 }
 
-triggerRouter.use(requireWatchdog)
+triggerRouter.use(requireSonar)
 
 triggerRouter.post('/error', (_req: Request, res: Response) => {
   try {
     throw new Error('Manual test error from testing-hub')
   } catch (err) {
-    watchdog!.captureError(err as Error, {
+    sonar!.captureError(err as Error, {
       fingerprint: 'my-awesome-api:manual-error',
       metadata: { source: 'trigger-route', timestamp: Date.now() },
     })
@@ -32,7 +32,7 @@ triggerRouter.post('/errors/batch', async (_req: Request, res: Response) => {
     { message: 'Batch error C', fingerprint: 'my-awesome-api:batch:C' },
   ]
   for (const e of errors) {
-    watchdog!.captureError(new Error(e.message), {
+    sonar!.captureError(new Error(e.message), {
       fingerprint: e.fingerprint,
     })
     await new Promise((r) => setTimeout(r, 50))
@@ -50,7 +50,7 @@ triggerRouter.post('/errors/with-stack', (_req: Request, res: Response) => {
   try {
     deeplyNested()
   } catch (err) {
-    watchdog!.captureError(err as Error, {
+    sonar!.captureError(err as Error, {
       fingerprint: 'my-awesome-api:deep-stack',
       metadata: { layer: 'deeplyNested' },
     })
@@ -59,14 +59,14 @@ triggerRouter.post('/errors/with-stack', (_req: Request, res: Response) => {
 })
 
 triggerRouter.post('/rejection', async (_req: Request, res: Response) => {
-  watchdog!.captureError(new Error('Simulated unhandled rejection'), {
+  sonar!.captureError(new Error('Simulated unhandled rejection'), {
     fingerprint: 'UnhandledRejection',
   })
   res.json({ ok: true, captured: true })
 })
 
 triggerRouter.post('/deploy', async (_req: Request, res: Response) => {
-  await watchdog!.recordDeployment({
+  await sonar!.recordDeployment({
     version: `${Date.now()}`,
     status: 'SUCCEEDED',
     description: 'Deployed from my-awesome-api',
@@ -76,7 +76,7 @@ triggerRouter.post('/deploy', async (_req: Request, res: Response) => {
 })
 
 triggerRouter.post('/deploy/fail', async (_req: Request, res: Response) => {
-  await watchdog!.recordDeployment({
+  await sonar!.recordDeployment({
     version: `${Date.now()}`,
     status: 'FAILED',
     description: 'Rolled back — db migration failed',

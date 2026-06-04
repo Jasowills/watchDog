@@ -118,8 +118,8 @@ export class NotificationsService {
       if (user?.email) {
         await this.email.send(
           user.email,
-          `[Watchdog] ${data.title}`,
-          `<p>${data.body ?? data.title}</p><p><a href="${process.env.CLIENT_URL ?? 'http://localhost:3000'}${data.link ?? ''}">View in Watchdog</a></p>`,
+          `[Sonar] ${data.title}`,
+          `<p>${data.body ?? data.title}</p><p><a href="${process.env.CLIENT_URL ?? 'http://localhost:3000'}${data.link ?? ''}">View in Sonar</a></p>`,
         );
       }
     }

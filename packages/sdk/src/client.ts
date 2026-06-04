@@ -1,14 +1,14 @@
-import type { WatchdogOptions, CaptureErrorPayload, RecordDeploymentOptions, IngestResponse } from './types'
+import type { SonarOptions, CaptureErrorPayload, RecordDeploymentOptions, IngestResponse } from './types'
 
 const DEFAULT_ENDPOINT = 'http://localhost:8080'
 
-export class WatchdogClient {
+export class SonarClient {
   private projectKey: string
   private environment: string
   private endpoint: string
   private token: string | null = null
 
-  constructor(options: WatchdogOptions) {
+  constructor(options: SonarOptions) {
     this.projectKey = options.projectKey
     this.environment = options.environment
     this.endpoint = options.endpoint ?? DEFAULT_ENDPOINT
@@ -56,7 +56,7 @@ export class WatchdogClient {
     if (!res.ok) {
       const body = await res.json().catch(() => null)
       const hint = res.status === 401
-        ? ' — check that WATCHDOG_API_KEY is set and valid'
+        ? ' — check that SONAR_API_KEY is set and valid'
         : ''
       throw new Error(body?.message ?? `Failed to ingest error (${res.status})${hint}`)
     }
@@ -80,7 +80,7 @@ export class WatchdogClient {
     if (!res.ok) {
       const body = await res.json().catch(() => null)
       const hint = res.status === 401
-        ? ' — check that WATCHDOG_API_KEY is set and valid'
+        ? ' — check that SONAR_API_KEY is set and valid'
         : ''
       throw new Error(body?.message ?? `Failed to record deployment (${res.status})${hint}`)
     }

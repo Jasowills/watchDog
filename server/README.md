@@ -1,13 +1,14 @@
-# Watchdog Server
+# Sonar Server
 
-The server is a NestJS application that will own the GraphQL API, authentication boundaries, monitor execution workflows, alert routing, and error ingestion pipeline.
+The server is a NestJS application that owns the GraphQL API, authentication boundaries, monitor execution workflows, alert routing, and error ingestion pipeline.
 
 ## Current Baseline
 
 - NestJS application shell
 - Apollo GraphQL wired at `/graphql`
 - Simple REST readiness route at `/`
-- Space reserved for Supabase, Prisma, and ingestion work
+- Prisma with MongoDB
+- Google OAuth and email/password authentication
 
 ## Local Development
 

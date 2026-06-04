@@ -2,23 +2,23 @@ export function ConnectSnippet({ projectKey, envKey }: { projectKey: string; env
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-[var(--text-muted)]">
-        Add the Watchdog SDK to your project:
+        Add the Sonar SDK to your project:
       </p>
       <pre className="border border-[var(--border-soft)] bg-[var(--surface-panel-soft)] p-4 text-xs text-[var(--text-main)] overflow-x-auto">
-{`npm install @watchdog/sdk
+{`npm install @sonar/sdk
 
-import { Watchdog } from '@watchdog/sdk'
+import { Sonar } from '@sonar/sdk'
 
-const watchdog = new Watchdog({
+const sonar = new Sonar({
   projectKey: '${projectKey || '<your-project-key>'}',
   envKey: '${envKey || '<your-env-key>'}',
 })
 
 // Capture errors
-watchdog.captureError(error)
+sonar.captureError(error)
 
 // Record deployments
-watchdog.recordDeployment({
+sonar.recordDeployment({
   environmentId: 'env-xxx',
   version: 'v1.0.0',
   description: 'Release v1.0.0',

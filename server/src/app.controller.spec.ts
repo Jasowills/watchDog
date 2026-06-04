@@ -17,7 +17,7 @@ describe('AppController', () => {
   describe('status', () => {
     it('returns the readiness payload', () => {
       expect(appController.getStatus()).toEqual({
-        name: 'Watchdog API',
+        name: 'Sonar API',
         status: 'ready',
         graphPath: '/graphql',
       });

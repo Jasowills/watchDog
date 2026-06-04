@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useProjects } from '@/lib/api'
 
-const STORAGE_KEY = 'watchdog:selected-project-id'
+const STORAGE_KEY = 'sonar:selected-project-id'
 
 function getStoredId(): string | null {
   try {

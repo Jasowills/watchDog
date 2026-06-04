@@ -1,4 +1,4 @@
-# Watchdog Roadmap
+# Sonar Roadmap
 
 ## Phase 0: Foundation
 
@@ -10,7 +10,7 @@
 ## Phase 1: Shell, Auth, and Workspaces
 
 - Scaffold frontend and backend apps
-- Configure Supabase Auth with Google OAuth
+- Configure Google OAuth
 - Build login, onboarding, workspace creation, and invitations
 - Implement workspace roles and project switching
 

@@ -9,7 +9,7 @@ export class SystemResolver {
   @Query(() => PlatformOverview)
   platformOverview(): PlatformOverview {
     return {
-      name: 'Watchdog API',
+      name: 'Sonar API',
       stage: process.env.NODE_ENV ?? 'development',
       graphPath: '/graphql',
       checkedAt: new Date().toISOString(),

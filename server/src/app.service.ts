@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getStatus() {
     return {
-      name: 'Watchdog API',
+      name: 'Sonar API',
       status: 'ready',
       graphPath: '/graphql',
     };

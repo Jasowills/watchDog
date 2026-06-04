@@ -132,7 +132,7 @@ function render(ok) {
   html += '</div>'
 
   html += '<h2>Monitor Endpoints</h2>'
-  html += '<p class="desc">Create watchdog monitors pointing at these URLs to track uptime, latency, and error rates.</p>'
+  html += '<p class="desc">Create Sonar monitors pointing at these URLs to track uptime, latency, and error rates.</p>'
   html += card('GET', '/api/health', 'Always returns 200. Baseline healthy endpoint.', 'http://localhost:3001/api/health', 'health', true)
   html += card('GET', '/api/slow', 'Responds after 1-4s. Tests latency tracking.', 'http://localhost:3001/api/slow', 'slow', true)
   html += card('GET', '/api/flaky', '200 ~60% / 500 ~40%. Tests state transitions.', 'http://localhost:3001/api/flaky', 'flaky', true)
@@ -140,7 +140,7 @@ function render(ok) {
   html += card('GET', '/api/version', 'Service metadata (version, node, uptime).', 'http://localhost:3001/api/version', 'version', true)
 
   html += '<h2>SDK Triggers</h2>'
-  html += '<p class="desc">Fire events through the watchdog SDK - they show up on your dashboards in real time.</p>'
+  html += '<p class="desc">Fire events through the @sonar/sdk — they show up on your dashboards in real time.</p>'
   html += card('POST', '/trigger/error', 'Captures a single error via SDK.', '', 'trigger-error')
   html += card('POST', '/trigger/errors/batch', 'Captures 3 errors with different fingerprints.', '', 'trigger-batch')
   html += card('POST', '/trigger/errors/with-stack', 'Throws from a deeply nested function call.', '', 'trigger-stack')
@@ -149,11 +149,11 @@ function render(ok) {
 
   html += '<h2>SDK Configuration</h2>'
   html += '<div class="sdk-banner">'
-  html += '<strong>@watchdog/sdk</strong> is configured via environment variables in <code>.env</code>:<br><br>'
-  html += '<span class="key">WATCHDOG_ENDPOINT</span> <span class="val">' + SDK.endpoint + '</span><br>'
-  html += '<span class="key">WATCHDOG_PROJECT_KEY</span> <span class="val">' + SDK.projectKey + '</span><br>'
-  html += '<span class="key">WATCHDOG_ENVIRONMENT_KEY</span> <span class="val">' + SDK.environmentKey + '</span><br>'
-  html += '<span class="key">WATCHDOG_API_KEY</span> <span class="val">' + SDK.apiKey + '</span><br><br>'
+  html += '<strong>@sonar/sdk</strong> is configured via environment variables in <code>.env</code>:<br><br>'
+  html += '<span class="key">SONAR_ENDPOINT</span> <span class="val">' + SDK.endpoint + '</span><br>'
+  html += '<span class="key">SONAR_PROJECT_KEY</span> <span class="val">' + SDK.projectKey + '</span><br>'
+  html += '<span class="key">SONAR_ENVIRONMENT_KEY</span> <span class="val">' + SDK.environmentKey + '</span><br>'
+  html += '<span class="key">SONAR_API_KEY</span> <span class="val">' + SDK.apiKey + '</span><br><br>'
   if (SDK.ok) {
     html += '<span style="color:#4ade80">SDK is configured and ready</span>'
   } else {

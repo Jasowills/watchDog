@@ -104,7 +104,7 @@ export function AppShell({
   const workspaceName = workspaces?.[0]?.name ?? 'Workspace'
 
   useEffect(() => {
-    document.title = title ? `${title} — Watchdog` : 'Watchdog'
+    document.title = title ? `${title} — Sonar` : 'Sonar'
   }, [title])
 
   return (
@@ -121,7 +121,7 @@ export function AppShell({
             </button>
             <LogoMark className="h-6 w-6" />
             <span className="text-base font-semibold tracking-[-0.01em] text-[var(--text-main)] hidden sm:inline">
-              Watchdog
+Sonar
             </span>
             <span className="hidden text-sm text-[var(--text-soft)] sm:inline">
               {workspaceName}

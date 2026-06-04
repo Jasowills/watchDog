@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
-const storageKey = 'watchdog-theme'
+const storageKey = 'sonar-theme'
 
 function getPreferredTheme(): Theme {
   if (typeof window === 'undefined') {

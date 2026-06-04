@@ -1,19 +1,19 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { WatchdogClient } from './client'
+import { SonarClient } from './client'
 import type {
-  WatchdogOptions,
+  SonarOptions,
   CaptureErrorOptions,
   RecordDeploymentOptions,
 } from './types'
 
 type NextFunction = (err?: unknown) => void
 
-export class Watchdog {
-  private client: WatchdogClient
+export class Sonar {
+  private client: SonarClient
   private release?: string
 
-  constructor(options: WatchdogOptions) {
-    this.client = new WatchdogClient(options)
+  constructor(options: SonarOptions) {
+    this.client = new SonarClient(options)
     this.release = options.release
   }
 
@@ -40,7 +40,7 @@ export class Watchdog {
 
     this.client.ingestError(payload).catch((err: unknown) => {
       const msg = err instanceof Error ? err.message : String(err)
-      console.error(`[Watchdog] ${msg}`)
+      console.error(`[Sonar] ${msg}`)
     })
   }
 
@@ -75,3 +75,5 @@ export class Watchdog {
     }
   }
 }
+
+export type { SonarOptions, CaptureErrorOptions, RecordDeploymentOptions }

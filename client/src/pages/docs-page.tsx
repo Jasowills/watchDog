@@ -60,11 +60,11 @@ const sections = [
 const content: Record<string, DocPage> = {
   overview: {
     title: 'Overview',
-    body: 'Watchdog is an observability platform designed for small SaaS teams. It unifies uptime monitoring, error tracing, alert routing, incident response, and status pages on a single surface. This documentation covers the Watchdog SDK, REST APIs, GraphQL queries, and best practices for integrating your services.',
+    body: 'Sonar is an observability platform designed for small SaaS teams. It unifies uptime monitoring, error tracing, alert routing, incident response, and status pages on a single surface. This documentation covers the Sonar SDK, REST APIs, GraphQL queries, and best practices for integrating your services.',
     sections: [
       {
-        heading: 'What is Watchdog?',
-        text: 'Watchdog provides a single operational surface for monitoring production services. It combines HTTP health checks, error ingestion from first-party SDKs, deploy tracking, incident timelines, alert routing, and public status pages — all scoped per workspace, project, service, and environment.',
+        heading: 'What is Sonar?',
+        text: 'Sonar provides a single operational surface for monitoring production services. It combines HTTP health checks, error ingestion from first-party SDKs, deploy tracking, incident timelines, alert routing, and public status pages — all scoped per workspace, project, service, and environment.',
       },
       {
         heading: 'Key concepts',
@@ -72,13 +72,13 @@ const content: Record<string, DocPage> = {
       },
       {
         heading: 'Architecture',
-        text: 'Watchdog exposes a GraphQL API for dashboard queries and REST endpoints for error and deployment ingestion. The server uses NestJS with Prisma and MongoDB. The client is a React SPA with the dashboard behind authentication and public pages (landing, docs, privacy, terms) open to all.',
+        text: 'Sonar exposes a GraphQL API for dashboard queries and REST endpoints for error and deployment ingestion. The server uses NestJS with Prisma and MongoDB. The client is a React SPA with the dashboard behind authentication and public pages (landing, docs, privacy, terms) open to all.',
       },
     ],
   },
   'getting-started': {
     title: 'Getting started',
-    body: 'Get your first monitor running in under five minutes. All you need is a running HTTP endpoint and a Watchdog account.',
+    body: 'Get your first monitor running in under five minutes. All you need is a running HTTP endpoint and a Sonar account.',
     sections: [
       {
         heading: '1. Create a workspace and project',
@@ -90,14 +90,14 @@ const content: Record<string, DocPage> = {
       },
       {
         heading: '3. Create a monitor',
-        text: 'Monitors run HTTP checks against your endpoints. Configure the URL, HTTP method, expected status code, check interval, and timeout. Watchdog will start checking immediately and report the state on the dashboard.',
+        text: 'Monitors run HTTP checks against your endpoints. Configure the URL, HTTP method, expected status code, check interval, and timeout. Sonar will start checking immediately and report the state on the dashboard.',
       },
     ],
   },
   'getting-started-quickstart': {
     title: 'Quickstart',
     body: 'A five-minute walkthrough to get your first monitor online and your first error ingested.',
-    code: `# 1. Sign in at https://watchdog.dev/app/overview
+    code: `# 1. Sign in at https://sonar.app/app/overview
 # 2. Create a workspace → add a project
 # 3. Create a service named "api" and an environment "production"
 # 4. Create a monitor pointing at your health endpoint:
@@ -113,7 +113,7 @@ const content: Record<string, DocPage> = {
 #      }) { id name latestState }
 #    }
 # 5. Install the SDK and send your first error:
-#    npm install @watchdog/sdk`,
+#    npm install @sonar/sdk`,
     sections: [
       {
         heading: 'Verify it works',
@@ -123,26 +123,26 @@ const content: Record<string, DocPage> = {
   },
   'getting-started-installation': {
     title: 'Installation',
-    body: 'Install the Watchdog SDK in your application to automatically capture errors and track deployments.',
+    body: 'Install the Sonar SDK in your application to automatically capture errors and track deployments.',
     code: `# Node.js / TypeScript
-npm install @watchdog/sdk
+npm install @sonar/sdk
 # or
-yarn add @watchdog/sdk
+yarn add @sonar/sdk
 # or
-pnpm add @watchdog/sdk
+pnpm add @sonar/sdk
 
 # Python
-pip install watchdog-sdk
+pip install sonar-sdk
 
 # Go
-go get github.com/watchdog/sdk-go
+go get github.com/sonar/sdk-go
 
 # Ruby
-gem install watchdog-sdk`,
+gem install sonar-sdk`,
     sections: [
       {
         heading: 'Requirements',
-        text: 'Node.js 18+ for the JavaScript SDK, Python 3.9+ for the Python SDK, Go 1.21+ for the Go SDK, Ruby 3.0+ for the Ruby SDK. All SDKs require a project key from the Watchdog dashboard.',
+        text: 'Node.js 18+ for the JavaScript SDK, Python 3.9+ for the Python SDK, Go 1.21+ for the Go SDK, Ruby 3.0+ for the Ruby SDK. All SDKs require a project key from the Sonar dashboard.',
       },
     ],
   },
@@ -150,38 +150,38 @@ gem install watchdog-sdk`,
     title: 'Configuration',
     body: 'Configure the SDK with your project credentials and environment settings.',
     code: `// Environment variables
-WATCHDOG_PROJECT_KEY=proj_xxx
-WATCHDOG_ENVIRONMENT=production
-WATCHDOG_RELEASE=v1.2.3
+SONAR_PROJECT_KEY=proj_xxx
+SONAR_ENVIRONMENT=production
+SONAR_RELEASE=v1.2.3
 
 // Or pass inline (Node.js example)
-import Watchdog from '@watchdog/sdk'
+import Sonar from '@sonar/sdk'
 
-const wd = new Watchdog({
-  projectKey: process.env.WATCHDOG_PROJECT_KEY,
-  environment: process.env.WATCHDOG_ENVIRONMENT || 'development',
-  release: process.env.WATCHDOG_RELEASE,
+const wd = new Sonar({
+  projectKey: process.env.SONAR_PROJECT_KEY,
+  environment: process.env.SONAR_ENVIRONMENT || 'development',
+  release: process.env.SONAR_RELEASE,
   // Optional: attach user context automatically
   captureUser: true,
 })`,
     sections: [
       {
         heading: 'Environment detection',
-        text: 'The SDK automatically reads NODE_ENV, ENV, or RAILS_ENV if no environment is explicitly provided. Set WATCHDOG_ENVIRONMENT explicitly for production deployments to ensure errors are tagged correctly.',
+        text: 'The SDK automatically reads NODE_ENV, ENV, or RAILS_ENV if no environment is explicitly provided. Set SONAR_ENVIRONMENT explicitly for production deployments to ensure errors are tagged correctly.',
       },
     ],
   },
   sdk: {
     title: 'SDK reference',
-    body: 'The Watchdog SDK is available for Node.js, Python, Go, and Ruby. Each SDK follows the same patterns — initialize with a project key, then capture errors and track releases with minimal boilerplate.',
+    body: 'The Sonar SDK is available for Node.js, Python, Go, and Ruby. Each SDK follows the same patterns — initialize with a project key, then capture errors and track releases with minimal boilerplate.',
   },
   'sdk-node.js': {
     title: 'Node.js SDK',
     body: 'The Node.js SDK captures uncaught exceptions, unhandled promise rejections, and provides a manual capture API. It integrates with Express, Next.js, and other frameworks.',
-    code: `import Watchdog from '@watchdog/sdk'
+    code: `import Sonar from '@sonar/sdk'
 
-const wd = new Watchdog({
-  projectKey: process.env.WATCHDOG_PROJECT_KEY,
+const wd = new Sonar({
+  projectKey: process.env.SONAR_PROJECT_KEY,
   environment: 'production',
 })
 
@@ -217,9 +217,9 @@ await wd.recordDeployment({
   'sdk-python': {
     title: 'Python SDK',
     body: 'The Python SDK supports Django, Flask, FastAPI, and standalone applications. It captures unhandled exceptions and integrates with ASGI/WSGI middleware.',
-    code: `from watchdog_sdk import Watchdog
+    code: `from sonar_sdk import Sonar
 
-wd = Watchdog(
+wd = Sonar(
     project_key="proj_xxx",
     environment="production",
 )
@@ -252,9 +252,9 @@ wd.record_deployment(version="v1.2.3", status="succeeded")`,
   'sdk-go': {
     title: 'Go SDK',
     body: 'The Go SDK captures panics and provides a manual capture API. It integrates with the standard net/http handler and popular frameworks like Gin and Echo.',
-    code: `import "github.com/watchdog/sdk-go"
+    code: `import "github.com/sonar/sdk-go"
 
-wd := watchdog.New(watchdog.Config{
+wd := sonar.New(sonar.Config{
     ProjectKey:  "proj_xxx",
     Environment: "production",
 })
@@ -265,14 +265,14 @@ defer wd.Recover()
 // Manual capture
 err := processOrder(data)
 if err != nil {
-    wd.CaptureError(err, watchdog.Metadata{
+    wd.CaptureError(err, sonar.Metadata{
         "fingerprint": "OrderProcessingError",
         "orderId":     data.ID,
     })
 }
 
 // Track deployment
-wd.RecordDeployment(watchdog.Deployment{
+wd.RecordDeployment(sonar.Deployment{
     Version: "v1.2.3",
     Status:  "succeeded",
 })`,
@@ -286,15 +286,15 @@ wd.RecordDeployment(watchdog.Deployment{
   'sdk-ruby': {
     title: 'Ruby SDK',
     body: 'The Ruby SDK integrates with Rails, Sinatra, and Rack applications. It captures exceptions and provides manual capture for background jobs.',
-    code: `require 'watchdog/sdk'
+    code: `require 'sonar/sdk'
 
-wd = Watchdog::SDK.new(
+wd = Sonar::SDK.new(
   project_key: 'proj_xxx',
   environment: 'production',
 )
 
 # Rack middleware (Rails / Sinatra)
-config.middleware.use Watchdog::Middleware
+config.middleware.use Sonar::Middleware
 
 # Manual capture
 begin
@@ -308,17 +308,17 @@ wd.record_deployment(version: 'v1.2.3', status: 'succeeded')`,
     sections: [
       {
         heading: 'Rails integration',
-        text: 'Add gem "watchdog-sdk" to your Gemfile and run bundle install. The Railtie automatically configures middleware and captures unhandled exceptions in all environments.',
+        text: 'Add gem "sonar-sdk" to your Gemfile and run bundle install. The Railtie automatically configures middleware and captures unhandled exceptions in all environments.',
       },
     ],
   },
   api: {
     title: 'API reference',
-    body: 'Watchdog exposes REST endpoints for high-throughput error and deployment ingestion, and a GraphQL endpoint for dashboard queries. Ingest endpoints require an API key (Bearer token). GraphQL queries require a JWT (issued at login).',
+    body: 'Sonar exposes REST endpoints for high-throughput error and deployment ingestion, and a GraphQL endpoint for dashboard queries. Ingest endpoints require an API key (Bearer token). GraphQL queries require a JWT (issued at login).',
   },
   'api-error-ingestion': {
     title: 'Error ingestion',
-    body: 'Send errors to Watchdog via the REST API. Each error is identified by a fingerprint — a stable identifier that groups similar errors together. When an error with the same fingerprint is sent repeatedly, Watchdog increments the occurrence count and updates the last-seen timestamp.',
+    body: 'Send errors to Sonar via the REST API. Each error is identified by a fingerprint — a stable identifier that groups similar errors together. When an error with the same fingerprint is sent repeatedly, Sonar increments the occurrence count and updates the last-seen timestamp.',
     code: `POST /ingest/errors
 Content-Type: application/json
 Authorization: Bearer <api-key>
@@ -340,7 +340,7 @@ Authorization: Bearer <api-key>
       },
       {
         heading: 'Fingerprinting strategy',
-        text: 'If you do not provide a fingerprint, Watchdog generates one from the error name, message, and top stack frame. You can override this to group errors by business logic categories.',
+        text: 'If you do not provide a fingerprint, Sonar generates one from the error name, message, and top stack frame. You can override this to group errors by business logic categories.',
       },
     ],
   },
@@ -367,7 +367,7 @@ Authorization: Bearer <api-key>
       },
       {
         heading: 'CI/CD integration',
-        text: 'Call the endpoint at the end of your CI pipeline. Use WATCHDOG_TOKEN as an environment variable in your CI secrets. The deployedBy field can be set to the CI provider name (e.g., "GitHub Actions", "CircleCI").',
+        text: 'Call the endpoint at the end of your CI pipeline. Use SONAR_TOKEN as an environment variable in your CI secrets. The deployedBy field can be set to the CI provider name (e.g., "GitHub Actions", "CircleCI").',
       },
     ],
   },
@@ -407,7 +407,7 @@ mutation UpdateMonitor {
     sections: [
       {
         heading: 'Check lifecycle',
-        text: 'Each check executes an HTTP request from Watchdog servers. A response within the timeout with the expected status code (and keyword, if configured) marks the check as healthy. Timeouts, wrong status codes, or missing keywords mark it as degraded or down.',
+        text: 'Each check executes an HTTP request from Sonar servers. A response within the timeout with the expected status code (and keyword, if configured) marks the check as healthy. Timeouts, wrong status codes, or missing keywords mark it as degraded or down.',
       },
     ],
   },
@@ -489,7 +489,7 @@ mutation CreateRule {
   },
   'guides-error-grouping': {
     title: 'Error grouping',
-    body: 'Watchdog groups errors by fingerprint — a deterministic hash of the error class, message, and stack trace. You can override the fingerprint to customize grouping behavior for your domain.',
+    body: 'Sonar groups errors by fingerprint — a deterministic hash of the error class, message, and stack trace. You can override the fingerprint to customize grouping behavior for your domain.',
     code: `// Override fingerprint for custom grouping
 // Instead of grouping by stack trace, group by business logic
 
@@ -514,13 +514,13 @@ wd.captureError(err, {
   },
   'guides-deploy-correlation': {
     title: 'Deploy correlation',
-    body: 'Every release appears on the same timeline as your incidents and latency data. When a deploy precedes an incident, Watchdog surfaces the correlation so you can quickly identify whether a rollout caused the issue.',
+    body: 'Every release appears on the same timeline as your incidents and latency data. When a deploy precedes an incident, Sonar surfaces the correlation so you can quickly identify whether a rollout caused the issue.',
     code: [
       '# CI pipeline integration (GitHub Actions example)',
       '- name: Record deployment',
       '  run: |',
-      '    curl -X POST https://api.watchdog.dev/ingest/deployments \\',
-      '      -H "Authorization: Bearer ${WATCHDOG_TOKEN}" \\',
+      '    curl -X POST https://api.sonar.app/ingest/deployments \\',
+      '      -H "Authorization: Bearer ${SONAR_TOKEN}" \\',
       '      -H "Content-Type: application/json" \\',
       "      -d '{",
       '        "environmentId": "env_xxx",',
@@ -534,7 +534,7 @@ wd.captureError(err, {
     sections: [
       {
         heading: 'Marking rollbacks',
-        text: 'If a deploy causes issues, mark it as ROLLED_BACK. Watchdog will highlight it on the incident timeline and exclude it from uptime calculations for the rolled-back version.',
+        text: 'If a deploy causes issues, mark it as ROLLED_BACK. Sonar will highlight it on the incident timeline and exclude it from uptime calculations for the rolled-back version.',
       },
     ],
   },
@@ -562,7 +562,7 @@ mutation LinkService {
     sections: [
       {
         heading: 'Visibility modes',
-        text: 'PUBLIC pages are accessible without authentication at https://your-slug.watchdog.dev. PRIVATE pages require a shared token. Use private pages for internal stakeholder communication during incidents.',
+        text: 'PUBLIC pages are accessible without authentication at https://your-slug.sonar.app. PRIVATE pages require a shared token. Use private pages for internal stakeholder communication during incidents.',
       },
     ],
   },
@@ -572,13 +572,13 @@ mutation LinkService {
   },
   'examples-express.js': {
     title: 'Express.js',
-    body: 'Integrate Watchdog with an Express.js application. The middleware captures request-scoped errors and attaches route context automatically.',
+    body: 'Integrate Sonar with an Express.js application. The middleware captures request-scoped errors and attaches route context automatically.',
     code: `import express from 'express'
-import Watchdog from '@watchdog/sdk'
+import Sonar from '@sonar/sdk'
 
 const app = express()
-const wd = new Watchdog({
-  projectKey: process.env.WATCHDOG_PROJECT_KEY,
+const wd = new Sonar({
+  projectKey: process.env.SONAR_PROJECT_KEY,
   environment: 'production',
 })
 
@@ -609,12 +609,12 @@ app.listen(3000)`,
   },
   'examples-next.js': {
     title: 'Next.js (App Router)',
-    body: 'Integrate Watchdog with Next.js App Router. The SDK captures server-side errors and supports both API routes and server components.',
-    code: `// app/api/watchdog/route.ts
-import Watchdog from '@watchdog/sdk'
+    body: 'Integrate Sonar with Next.js App Router. The SDK captures server-side errors and supports both API routes and server components.',
+    code: `// app/api/sonar/route.ts
+import Sonar from '@sonar/sdk'
 
-const wd = new Watchdog({
-  projectKey: process.env.WATCHDOG_PROJECT_KEY!,
+const wd = new Sonar({
+  projectKey: process.env.SONAR_PROJECT_KEY!,
   environment: process.env.NODE_ENV,
 })
 
@@ -646,7 +646,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    fetch('/api/watchdog/ingest', {
+    fetch('/api/sonar/ingest', {
       method: 'POST',
       body: JSON.stringify({
         fingerprint: error.name,
@@ -666,18 +666,18 @@ export default function Error({
   },
   'examples-fastapi': {
     title: 'FastAPI',
-    body: 'Integrate Watchdog with FastAPI using ASGI middleware. Errors are automatically captured with request context.',
+    body: 'Integrate Sonar with FastAPI using ASGI middleware. Errors are automatically captured with request context.',
     code: `from fastapi import FastAPI, Request
-from watchdog_sdk import Watchdog
-from watchdog_sdk.integrations.fastapi import WatchdogMiddleware
+from sonar_sdk import Sonar
+from sonar_sdk.integrations.fastapi import SonarMiddleware
 
 app = FastAPI()
-wd = Watchdog(
+wd = Sonar(
     project_key="proj_xxx",
     environment="production",
 )
 
-app.add_middleware(WatchdogMiddleware, client=wd)
+app.add_middleware(SonarMiddleware, client=wd)
 
 @app.post("/checkout")
 async def checkout(request: Request):
@@ -703,22 +703,22 @@ async def track_deploy():
   },
   'examples-cli-tools': {
     title: 'CLI tools',
-    body: 'Use curl or any HTTP client to interact with Watchdog APIs directly. Perfect for CI/CD pipelines, monitoring scripts, and quick testing.',
+    body: 'Use curl or any HTTP client to interact with Sonar APIs directly. Perfect for CI/CD pipelines, monitoring scripts, and quick testing.',
     code: `# Authenticate and get a JWT (for GraphQL queries)
-TOKEN=$(curl -s -X POST https://api.watchdog.dev/auth/login \\
+TOKEN=$(curl -s -X POST https://api.sonar.app/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{"email": "user@example.com", "password": "your-password"}' \\
   | jq -r '.token')
 
 # List monitors (GraphQL — uses JWT)
-curl -s https://api.watchdog.dev/graphql \\
+curl -s https://api.sonar.app/graphql \\
   -H "Authorization: Bearer $TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{"query": "{ monitors { id name targetUrl latestState } }"}' \\
   | jq '.data.monitors'
 
 # Ingest an error (REST — uses API key from Dashboard → Settings → API Keys)
-curl -s -X POST https://api.watchdog.dev/ingest/errors \\
+curl -s -X POST https://api.sonar.app/ingest/errors \\
   -H "Authorization: Bearer wdp_xxxx_yyyy" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -729,7 +729,7 @@ curl -s -X POST https://api.watchdog.dev/ingest/errors \\
   }'
 
 # Record a deployment (REST — uses API key)
-curl -s -X POST https://api.watchdog.dev/ingest/deployments \\
+curl -s -X POST https://api.sonar.app/ingest/deployments \\
   -H "Authorization: Bearer wdp_xxxx_yyyy" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -829,7 +829,7 @@ export function DocsPage() {
             <Link to="/" className="flex items-center gap-2.5">
               <LogoMark className="h-6 w-6" />
               <span className="text-sm font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-                Watchdog
+                Sonar
               </span>
             </Link>
             <span className="text-xs text-[var(--text-muted)]">/</span>
@@ -1030,7 +1030,7 @@ export function DocsPage() {
 
       <footer className="border-t border-[var(--border-soft)] px-5 py-10 lg:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-xs text-[var(--text-muted)] sm:flex-row">
-          <p>&copy; {new Date().getFullYear()} Watchdog. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Sonar. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link to="/privacy" className="hover:text-[var(--text-main)]">
               Privacy

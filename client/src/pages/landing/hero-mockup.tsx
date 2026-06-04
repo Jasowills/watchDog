@@ -111,7 +111,7 @@ export function HeroMockup() {
         <span className="h-2.5 w-2.5 rounded-full bg-[var(--border-strong)]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[var(--border-strong)]" />
         <span className="ml-3 font-[var(--font-mono)] text-xs text-[var(--text-muted)]">
-          watchdog.app/overview
+          sonar.app/overview
         </span>
         <span className="ml-auto flex items-center gap-2 rounded-full border border-[var(--border-soft)] px-2.5 py-1 text-[0.65rem] font-medium text-[var(--text-muted)]">
           <span className="signal-pulse h-1.5 w-1.5 rounded-full bg-[oklch(0.72_0.17_152)]" />

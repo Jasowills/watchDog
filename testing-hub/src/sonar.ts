@@ -1,34 +1,34 @@
-import { Watchdog } from '@watchdog/sdk'
+import { Sonar } from '@sonar/sdk'
 
-const ENDPOINT = process.env.WATCHDOG_ENDPOINT ?? 'http://localhost:8080'
-const PROJECT_KEY = process.env.WATCHDOG_PROJECT_KEY
-const ENVIRONMENT_KEY = process.env.WATCHDOG_ENVIRONMENT_KEY
-const API_KEY = process.env.WATCHDOG_API_KEY
+const ENDPOINT = process.env.SONAR_ENDPOINT ?? 'http://localhost:8080'
+const PROJECT_KEY = process.env.SONAR_PROJECT_KEY
+const ENVIRONMENT_KEY = process.env.SONAR_ENVIRONMENT_KEY
+const API_KEY = process.env.SONAR_API_KEY
 
 export type SdkStatus = { ok: boolean; message: string }
 
-export const watchdog = PROJECT_KEY && ENVIRONMENT_KEY
+export const sonar = PROJECT_KEY && ENVIRONMENT_KEY
   ? (() => {
-      const wd = new Watchdog({
+      const s = new Sonar({
         projectKey: PROJECT_KEY,
         environment: ENVIRONMENT_KEY,
         endpoint: ENDPOINT,
         release: `my-awesome-api@${Date.now()}`,
       })
-      if (API_KEY) wd.setToken(API_KEY)
-      return wd
+      if (API_KEY) s.setToken(API_KEY)
+      return s
     })()
   : null
 
 export async function checkSdkStatus(): Promise<SdkStatus> {
   if (!PROJECT_KEY || !ENVIRONMENT_KEY) {
-    return { ok: false, message: 'WATCHDOG_PROJECT_KEY and WATCHDOG_ENVIRONMENT_KEY must be set' }
+    return { ok: false, message: 'SONAR_PROJECT_KEY and SONAR_ENVIRONMENT_KEY must be set' }
   }
   if (!API_KEY) {
-    return { ok: false, message: 'WATCHDOG_API_KEY is not set' }
+    return { ok: false, message: 'SONAR_API_KEY is not set' }
   }
   if (API_KEY === 'wdp_xxxxxxxx_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy') {
-    return { ok: false, message: 'WATCHDOG_API_KEY is still the placeholder — create a real key in watchdog Settings → API Keys' }
+    return { ok: false, message: 'SONAR_API_KEY is still the placeholder — create a real key in Sonar Settings → API Keys' }
   }
   // Test the API key against the server
   try {
@@ -63,6 +63,6 @@ export async function checkSdkStatus(): Promise<SdkStatus> {
     }
     return { ok: false, message: `Server returned ${res.status}` }
   } catch (err) {
-    return { ok: false, message: `Cannot reach watchdog server at ${ENDPOINT}` }
+    return { ok: false, message: `Cannot reach Sonar server at ${ENDPOINT}` }
   }
 }

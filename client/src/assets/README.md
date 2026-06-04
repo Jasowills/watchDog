@@ -1,11 +1,11 @@
-# Watchdog — Logo Assets
+# Sonar — Logo Assets
 
 ## Files
 
 | File | Format | Size | Use |
 |------|--------|------|-----|
-| `watchdog-logo.svg` | SVG | 480×160 | Full lockup — nav bars, docs, marketing |
-| `watchdog-mark.svg` | SVG | 160×160 | Standalone mark — app icons, avatars, compact UI |
+| `sonar-logo.svg` | SVG | 480×160 | Full lockup — nav bars, docs, marketing |
+| `sonar-mark.svg` | SVG | 160×160 | Standalone mark — app icons, avatars, compact UI |
 | `favicon.svg` | SVG | 32×32 | Browser favicon (modern browsers) |
 | `favicon.ico` | ICO | 16/32/48px | Browser favicon (universal fallback) |
 | `favicon-32.png` | PNG | 32×32 | Fallback / meta tags |

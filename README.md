@@ -1,19 +1,20 @@
-# Watchdog
+# Sonar
 
-Watchdog is a professional observability platform for SaaS teams.
+Sonar is a professional observability platform for SaaS teams.
 It combines uptime monitoring, real SDK-based error tracing, alert routing, incident timelines, and status communication in one product.
 
-## Planned Stack
+## Stack
 
-- Frontend: Vite, React, TypeScript, Tailwind CSS, shadcn/ui
-- Backend: NestJS, GraphQL with Apollo
-- Database: Supabase Postgres
-- Auth: Supabase Auth with Google OAuth
+- Frontend: Vite, React, TypeScript, Tailwind CSS
+- Backend: NestJS, GraphQL with Apollo, Prisma with MongoDB
+- Auth: Google OAuth and email/password with bcrypt
 
 ## Workspace Layout
 
 - `client/` for the product frontend
 - `server/` for the NestJS GraphQL backend
+- `packages/sdk/` for the first-party SDK (`@sonar/sdk`)
+- `testing-hub/` for SDK integration testing
 - `docs/` for roadmap and architecture notes
 
 ## Development
@@ -38,13 +39,13 @@ By default:
 - Uptime checks and check history
 - Incident lifecycle and timelines
 - Error tracing and grouped events
-- Alert routing
+- Alert routing (email, Slack, webhook)
 - Status pages
+- Real-time notifications (SSE, toasts, side panel)
 
 ## Design Direction
 
-- Premium enterprise product
-- Light-first interface with dark mode support
-- Clean, spacious layouts with strong hierarchy
+- Deep black dark mode first, with light mode support
+- Monochrome grayscale UI with subtle status colors
+- Sharp corners, no shadows
 - Calm operational tone over flashy security aesthetics
-

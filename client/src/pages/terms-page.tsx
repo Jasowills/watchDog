@@ -20,7 +20,7 @@ export function TermsPage() {
               Acceptance of Terms
             </h2>
             <p>
-              By accessing or using Watchdog, you agree to be bound by these
+              By accessing or using Sonar, you agree to be bound by these
               Terms &amp; Conditions. If you do not agree, you may not use the
               service.
             </p>
@@ -31,7 +31,7 @@ export function TermsPage() {
               Description of Service
             </h2>
             <p>
-              Watchdog provides a unified observability platform including
+              Sonar provides a unified observability platform including
               uptime monitoring, error tracing, alert routing, incident
               management, and status pages. The service is delivered as a
               cloud-based web application.
@@ -77,7 +77,7 @@ export function TermsPage() {
               Limitation of Liability
             </h2>
             <p>
-              Watchdog shall not be liable for any indirect, incidental,
+              Sonar shall not be liable for any indirect, incidental,
               special, or consequential damages arising from your use of the
               service, including but not limited to missed incidents, data loss,
               or business interruption.

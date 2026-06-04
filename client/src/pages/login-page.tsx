@@ -186,7 +186,7 @@ function AuthCard({
           <span className="text-lg font-bold text-[var(--text-main)]">W</span>
         </div>
         <h1 className="mt-5 text-xl font-semibold tracking-tight text-[var(--text-main)]">
-          {mode === 'register' ? 'Create an account' : 'Sign in to Watchdog'}
+          {mode === 'register' ? 'Create an account' : 'Sign in to Sonar'}
         </h1>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
           {mode === 'register'

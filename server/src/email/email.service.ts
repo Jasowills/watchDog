@@ -33,7 +33,7 @@ export class EmailService {
       return false;
     }
     try {
-      const from = process.env.SMTP_FROM || 'watchdog@localhost';
+      const from = process.env.SMTP_FROM || 'sonar@localhost';
       await this.transporter.sendMail({ from, to, subject, html });
       this.logger.log(`Email sent: ${subject} → ${to}`);
       return true;

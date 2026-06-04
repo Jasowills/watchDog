@@ -45,7 +45,7 @@ export class CheckerService {
         void this.check(monitor);
       }
     } catch (err) {
-      this.logger.error('Checker tick failed', err);
+      this.logger.debug('Checker tick skipped (DB unavailable)');
     }
   }
 

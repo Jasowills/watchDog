@@ -91,7 +91,7 @@ export function OnboardingWizard() {
       render: () => (
         <div>
           <p className="text-sm leading-6 text-[var(--text-muted)]">
-            Watchdog pings your endpoints and reports uptime, latency, and status changes.
+            Sonar pings your endpoints and reports uptime, latency, and status changes.
           </p>
           {hasProject && hasEnvironment && hasService && (
             <button

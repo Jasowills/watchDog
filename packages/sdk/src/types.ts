@@ -1,4 +1,4 @@
-export type WatchdogOptions = {
+export type SonarOptions = {
   projectKey: string
   environment: string
   release?: string
